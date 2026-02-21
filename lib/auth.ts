@@ -8,6 +8,8 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    // TODO: enable this once we have email sending set up (production only)
+    // requireEmailVerification: true,
   },
   socialProviders: {
     google: {
