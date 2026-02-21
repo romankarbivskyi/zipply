@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Zipply",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="dark antialiased">{children}</body>
+      <body className="dark antialiased min-h-screen flex">
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }
