@@ -75,7 +75,7 @@ const AppSidebar = () => {
                 >
                   <Link href="/dashboard/links/create">
                     <LinkIcon className="size-4" />
-                    <span>Create Link</span>
+                    <span>Create New</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
