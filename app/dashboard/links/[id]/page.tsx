@@ -1,38 +1,48 @@
-import CountriesChart from "@/components/dashboard/charts/countries-chart";
-import DateRangeSelect from "@/components/dashboard/date-range-select";
-import DevicesChart from "@/components/dashboard/charts/devices-chart";
-import Heading from "@/components/dashboard/heading";
-import SectionCards from "@/components/dashboard/section-cards";
-import VisitorsChart from "@/components/dashboard/charts/visitors-chart";
 import {
   VisitorsChartSkeleton,
   CountriesChartSkeleton,
   DevicesChartSkeleton,
 } from "@/components/dashboard/charts/chart-skeletons";
-import { Suspense } from "react";
+import CountriesChart from "@/components/dashboard/charts/countries-chart";
+import DevicesChart from "@/components/dashboard/charts/devices-chart";
+import VisitorsChart from "@/components/dashboard/charts/visitors-chart";
+import DateRangeSelect from "@/components/dashboard/date-range-select";
+import Heading from "@/components/dashboard/heading";
+import LinkCard from "@/components/dashboard/links/link-card";
 import {
   getClicksOverTime,
   getCountriesData,
   getDevicesData,
+  getLinkById,
 } from "@/data/links";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function Page({
+  params,
   searchParams,
 }: {
+  params: Promise<{ id: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const params = await searchParams;
-  const timeRange = (params.timeRange as string) || "30d";
+  const linkId = (await params).id;
+  const timeRange = ((await searchParams).timeRange as string) || "30d";
 
-  const clicksData = await getClicksOverTime(timeRange);
-  const countriesData = await getCountriesData(timeRange);
-  const devicesData = await getDevicesData(timeRange);
+  const link = await getLinkById(linkId);
+
+  if (!link) {
+    notFound();
+  }
+
+  const clicksData = await getClicksOverTime(timeRange, linkId);
+  const countriesData = await getCountriesData(timeRange, linkId);
+  const devicesData = await getDevicesData(timeRange, linkId);
 
   return (
     <div className="flex flex-1 flex-col">
-      <Heading title="Dashboard" />
+      <Heading title="Link Details" />
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-4">
-        <SectionCards />
+        <LinkCard link={link} />
         <DateRangeSelect />
         <Suspense fallback={<VisitorsChartSkeleton />}>
           <VisitorsChart data={clicksData} />

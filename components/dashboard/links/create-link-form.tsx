@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { createLink } from "@/lib/actions/links";
+import { createLink } from "@/actions/links";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";

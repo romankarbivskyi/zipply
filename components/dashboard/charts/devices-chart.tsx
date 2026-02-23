@@ -11,13 +11,6 @@ import {
   ChartConfig,
 } from "../../ui/chart";
 
-const chartData = [
-  { device: "desktop", visitors: 5420, fill: "var(--color-desktop)" },
-  { device: "mobile", visitors: 3840, fill: "var(--color-mobile)" },
-  { device: "tablet", visitors: 1260, fill: "var(--color-tablet)" },
-  { device: "other", visitors: 380, fill: "var(--color-other)" },
-];
-
 const chartConfig = {
   visitors: {
     label: "Visitors",
@@ -40,35 +33,51 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const DevicesChart = () => {
+interface ChartData {
+  device: string;
+  visitors: number;
+  fill: string;
+}
+
+interface DevicesChartProps {
+  data: ChartData[];
+}
+
+const DevicesChart = ({ data }: DevicesChartProps) => {
   return (
     <Card className="flex flex-col">
       <CardHeader>
         <CardTitle>Devices</CardTitle>
       </CardHeader>
       <CardContent className="flex-1">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square h-[250px] w-full"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie
-              data={chartData}
-              dataKey="visitors"
-              nameKey="device"
-              innerRadius={60}
-              strokeWidth={2}
-            />
-            <ChartLegend
-              content={<ChartLegendContent nameKey="device" />}
-              className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
-            />
-          </PieChart>
-        </ChartContainer>
+        {!data.length ? (
+          <div className="flex h-[250px] flex-col items-center justify-center gap-2">
+            <p className="text-muted-foreground text-sm">No data available</p>
+          </div>
+        ) : (
+          <ChartContainer
+            config={chartConfig}
+            className="mx-auto aspect-square h-[250px] w-full"
+          >
+            <PieChart>
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Pie
+                data={data}
+                dataKey="visitors"
+                nameKey="device"
+                innerRadius={60}
+                strokeWidth={2}
+              />
+              <ChartLegend
+                content={<ChartLegendContent nameKey="device" />}
+                className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+              />
+            </PieChart>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   );

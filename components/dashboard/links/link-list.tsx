@@ -1,4 +1,4 @@
-import { fetchFilteredLinks } from "@/lib/data/links";
+import { fetchFilteredLinks } from "@/data/links";
 import LinkItem from "./link-item";
 import { IconPlus } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";

@@ -4,7 +4,7 @@ import LinkList from "@/components/dashboard/links/link-list";
 import Search from "@/components/dashboard/links/search";
 import Pagination from "@/components/dashboard/links/pagination";
 import { LinkListSkeleton } from "@/components/dashboard/links/link-list-skeleton";
-import { fetchLinksPages } from "@/lib/data/links";
+import { fetchLinksPages } from "@/data/links";
 
 interface PageProps {
   searchParams: Promise<{

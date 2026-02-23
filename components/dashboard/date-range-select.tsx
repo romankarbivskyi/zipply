@@ -8,18 +8,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const DateRangeSelect = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const timeRange = searchParams.get("timeRange") || "30d";
 
   const handleTimeRangeChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("timeRange", value);
-    router.replace(`/dashboard?${params.toString()}`, { scroll: false });
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (

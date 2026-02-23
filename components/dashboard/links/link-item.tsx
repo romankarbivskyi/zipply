@@ -11,14 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate, formatNumberWithSuffix } from "@/lib/utils";
 import {
   IconExternalLink,
-  IconCopy,
   IconClick,
   IconCalendar,
-  IconCheck,
+  IconWorld,
 } from "@tabler/icons-react";
 import type { Link as LinkType } from "@/lib/generated/prisma/client";
 import Link from "next/link";
-import { useState } from "react";
+import Image from "next/image";
+import { CopyButton } from "@/components/copy-button";
 
 interface LinkItemProps {
   link: LinkType;
@@ -32,24 +32,44 @@ const LinkItem = ({ link }: LinkItemProps) => {
       <Card className="group transition-shadow hover:shadow-md">
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex-1 space-y-1">
-              <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <span className="text-primary truncate font-mono text-sm">
-                  {shortUrl}
-                </span>
-                <CopyButton text={shortUrl} />
-              </CardTitle>
-              <CardDescription className="flex items-center gap-1.5 truncate">
-                <IconExternalLink className="size-3.5 shrink-0" />
-                <a
-                  href={link.originalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-foreground truncate transition-colors hover:underline"
-                >
-                  {link.originalUrl}
-                </a>
-              </CardDescription>
+            <div className="flex min-w-0 flex-1 items-start gap-3">
+              <div className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-lg">
+                {link.favicon ? (
+                  <Image
+                    src={link.favicon}
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="rounded-sm"
+                  />
+                ) : (
+                  <IconWorld className="text-muted-foreground size-5" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1 space-y-1">
+                <CardTitle className="truncate text-sm font-semibold">
+                  {link.title}
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  <span className="text-primary truncate font-mono text-xs">
+                    {shortUrl}
+                  </span>
+                  <CopyButton text={shortUrl} />
+                </div>
+                <CardDescription>
+                  <Link
+                    href={link.originalUrl}
+                    className="flex items-center gap-1.5 truncate text-xs"
+                    target="_blank"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <IconExternalLink className="size-3 shrink-0" />
+                    <span className="truncate hover:underline">
+                      {link.originalUrl}
+                    </span>
+                  </Link>
+                </CardDescription>
+              </div>
             </div>
             <Badge variant="secondary" className="shrink-0 gap-1">
               <IconClick className="size-3.5" />
@@ -65,32 +85,6 @@ const LinkItem = ({ link }: LinkItemProps) => {
         </CardContent>
       </Card>
     </Link>
-  );
-};
-
-const CopyButton = ({ text }: { text: string }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
-      title="Copy short URL"
-    >
-      {copied ? (
-        <IconCheck className="size-3.5" />
-      ) : (
-        <IconCopy className="size-3.5" />
-      )}
-    </button>
   );
 };
 

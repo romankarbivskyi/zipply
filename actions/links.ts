@@ -6,8 +6,9 @@ import { createLinkSchema } from "@/schemas/link";
 import { headers } from "next/headers";
 import { nanoid } from "nanoid";
 import { redirect } from "next/navigation";
+import { getMetadata } from "@/lib/metadata";
 
-export async function createLink(formData: FormData) {
+export const createLink = async (formData: FormData) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -30,6 +31,11 @@ export async function createLink(formData: FormData) {
   const { url, shortCode } = parsed.data;
   const code = shortCode || nanoid(7);
 
+  const metadata = await getMetadata(parsed.data.url);
+
+  const title = metadata?.title || `${url} - untitled`;
+  const favicon = metadata?.touchIcon;
+
   const existing = await prisma.link.findFirst({
     where: { shortCode: code },
   });
@@ -43,8 +49,10 @@ export async function createLink(formData: FormData) {
       originalUrl: url,
       shortCode: code,
       userId: session.user.id,
+      title,
+      favicon,
     },
   });
 
   redirect("/dashboard/links");
-}
+};
