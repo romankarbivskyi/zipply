@@ -1,22 +1,30 @@
+import { use } from "react";
 import {
   Card,
-  CardAction,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { Badge } from "../ui/badge";
-import {
-  IconLink,
-  IconClick,
-  IconUsers,
-  IconTrendingDown,
-  IconTrendingUp,
-} from "@tabler/icons-react";
+import { IconLink, IconClick, IconUsers } from "@tabler/icons-react";
 import { formatNumberWithSuffix } from "@/lib/utils";
+import { DashboardMetrics } from "@/data/links";
 
-const SectionCards = () => {
+interface SectionCardsProps {
+  data: Promise<DashboardMetrics>;
+  timeRange: string;
+}
+
+const timeRangeMap: Record<string, string> = {
+  "7d": "7 days",
+  "30d": "30 days",
+  "90d": "90 days",
+};
+
+const SectionCards = ({ data, timeRange }: SectionCardsProps) => {
+  const periodLabel = timeRangeMap[timeRange] || "the selected period";
+  const metrics = use(data);
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Card className="from-background to-card/50 @container/card bg-linear-to-b">
@@ -26,12 +34,12 @@ const SectionCards = () => {
             Total Links
           </CardDescription>
           <CardTitle className="@[250px]:card:text-3xl text-2xl font-bold tracking-tight tabular-nums">
-            {formatNumberWithSuffix(1000)}
+            {formatNumberWithSuffix(metrics.totalLinks)}
           </CardTitle>
         </CardHeader>
         <CardFooter>
           <p className="text-muted-foreground line-clamp-1 text-sm">
-            Total links created
+            Total links created in {periodLabel}
           </p>
         </CardFooter>
       </Card>
@@ -43,22 +51,13 @@ const SectionCards = () => {
             Total Clicks
           </CardDescription>
           <CardTitle className="@[250px]:card:text-3xl text-2xl font-bold tracking-tight tabular-nums">
-            {formatNumberWithSuffix(100000)}
+            {formatNumberWithSuffix(metrics.totalClicks)}
           </CardTitle>
-          <CardAction>
-            <Badge
-              variant="outline"
-              className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:border-emerald-400/30 dark:bg-emerald-400/10 dark:text-emerald-400"
-            >
-              <IconTrendingUp className="size-4!" />
-              +10%
-            </Badge>
-          </CardAction>
         </CardHeader>
 
         <CardFooter>
           <p className="text-muted-foreground line-clamp-1 text-sm">
-            Total clicks for 30 days
+            Total clicks for {periodLabel}
           </p>
         </CardFooter>
       </Card>
@@ -70,22 +69,13 @@ const SectionCards = () => {
             Unique Users
           </CardDescription>
           <CardTitle className="@[250px]:card:text-3xl text-2xl font-bold tracking-tight tabular-nums">
-            {formatNumberWithSuffix(100000)}
+            {formatNumberWithSuffix(metrics.uniqueVisitors)}
           </CardTitle>
-          <CardAction>
-            <Badge
-              variant="outline"
-              className="border-rose-500/30 bg-rose-500/10 text-rose-600 dark:border-rose-400/30 dark:bg-rose-400/10 dark:text-rose-400"
-            >
-              <IconTrendingDown className="size-4!" />
-              -10%
-            </Badge>
-          </CardAction>
         </CardHeader>
 
         <CardFooter>
           <p className="text-muted-foreground line-clamp-1 text-sm">
-            Total unique users for 30 days
+            Total unique users for {periodLabel}
           </p>
         </CardFooter>
       </Card>

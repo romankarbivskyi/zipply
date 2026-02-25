@@ -33,6 +33,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+import { use } from "react";
+
 interface ChartData {
   device: string;
   visitors: number;
@@ -40,17 +42,19 @@ interface ChartData {
 }
 
 interface DevicesChartProps {
-  data: ChartData[];
+  data: Promise<ChartData[]>;
 }
 
 const DevicesChart = ({ data }: DevicesChartProps) => {
+  const chartData = use(data);
+
   return (
     <Card className="flex flex-col">
       <CardHeader>
         <CardTitle>Devices</CardTitle>
       </CardHeader>
       <CardContent className="flex-1">
-        {!data.length ? (
+        {!chartData.length ? (
           <div className="flex h-[250px] flex-col items-center justify-center gap-2">
             <p className="text-muted-foreground text-sm">No data available</p>
           </div>
@@ -65,7 +69,7 @@ const DevicesChart = ({ data }: DevicesChartProps) => {
                 content={<ChartTooltipContent hideLabel />}
               />
               <Pie
-                data={data}
+                data={chartData}
                 dataKey="visitors"
                 nameKey="device"
                 innerRadius={60}

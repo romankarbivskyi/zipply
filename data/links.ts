@@ -5,6 +5,12 @@ import { Link } from "@/lib/generated/prisma/client";
 
 const LINKS_PER_PAGE = 10;
 
+export interface DashboardMetrics {
+  totalLinks: number;
+  totalClicks: number;
+  uniqueVisitors: number;
+}
+
 export const fetchFilteredLinks = async (
   search: string,
   currentPage: number,
@@ -235,4 +241,45 @@ export const getDevicesData = async (period: string, linkId?: string) => {
       fill: colorMap[device] || "var(--color-other)",
     };
   });
+};
+
+export const getDashboardMetrics = async (
+  period: string,
+): Promise<DashboardMetrics> => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) return { totalLinks: 0, totalClicks: 0, uniqueVisitors: 0 };
+
+  const startDate = getPeriodStartDate(period);
+
+  const [totalLinks, totalClicks, uniqueVisitors] = await Promise.all([
+    prisma.link.count({
+      where: {
+        userId: session.user.id,
+        createdAt: { gte: startDate },
+      },
+    }),
+    prisma.click.count({
+      where: {
+        link: { userId: session.user.id },
+        createdAt: { gte: startDate },
+      },
+    }),
+    prisma.click.groupBy({
+      by: ["ipAddress"],
+      where: {
+        link: { userId: session.user.id },
+        ipAddress: { not: null },
+        createdAt: { gte: startDate },
+      },
+    }),
+  ]);
+
+  return {
+    totalLinks,
+    totalClicks,
+    uniqueVisitors: uniqueVisitors.length,
+  };
 };

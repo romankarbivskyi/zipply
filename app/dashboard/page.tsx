@@ -8,11 +8,13 @@ import {
   VisitorsChartSkeleton,
   CountriesChartSkeleton,
   DevicesChartSkeleton,
+  SectionCardsSkeleton,
 } from "@/components/dashboard/charts/chart-skeletons";
 import { Suspense } from "react";
 import {
   getClicksOverTime,
   getCountriesData,
+  getDashboardMetrics,
   getDevicesData,
 } from "@/data/links";
 
@@ -24,15 +26,19 @@ export default async function Page({
   const params = await searchParams;
   const timeRange = (params.timeRange as string) || "30d";
 
-  const clicksData = await getClicksOverTime(timeRange);
-  const countriesData = await getCountriesData(timeRange);
-  const devicesData = await getDevicesData(timeRange);
+  const clicksData = getClicksOverTime(timeRange);
+  const countriesData = getCountriesData(timeRange);
+  const devicesData = getDevicesData(timeRange);
+
+  const metrics = getDashboardMetrics(timeRange);
 
   return (
     <div className="flex flex-1 flex-col">
       <Heading title="Dashboard" />
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-4">
-        <SectionCards />
+        <Suspense fallback={<SectionCardsSkeleton />}>
+          <SectionCards data={metrics} timeRange={timeRange} />
+        </Suspense>
         <DateRangeSelect />
         <Suspense fallback={<VisitorsChartSkeleton />}>
           <VisitorsChart data={clicksData} />

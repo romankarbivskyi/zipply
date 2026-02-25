@@ -16,23 +16,27 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+import { use } from "react";
+
 interface ChartData {
   country: string;
   visitors: number;
 }
 
 interface CountriesChartProps {
-  data: ChartData[];
+  data: Promise<ChartData[]>;
 }
 
 const CountriesChart = ({ data }: CountriesChartProps) => {
+  const chartData = use(data);
+
   return (
     <Card className="flex flex-col">
       <CardHeader>
         <CardTitle>Top Countries</CardTitle>
       </CardHeader>
       <CardContent className="flex-1">
-        {!data.length ? (
+        {!chartData.length ? (
           <div className="flex h-[250px] flex-col items-center justify-center gap-2">
             <p className="text-muted-foreground text-sm">No data available</p>
           </div>
@@ -42,7 +46,7 @@ const CountriesChart = ({ data }: CountriesChartProps) => {
             className="aspect-auto h-[250px] w-full"
           >
             <BarChart
-              data={data}
+              data={chartData}
               layout="vertical"
               margin={{ left: 0, right: 16 }}
             >

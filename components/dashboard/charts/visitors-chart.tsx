@@ -23,6 +23,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+import { use } from "react";
+
 interface ChartData {
   date: string;
   clicks: number;
@@ -30,10 +32,12 @@ interface ChartData {
 }
 
 interface VisitorsChartProps {
-  data: ChartData[];
+  data: Promise<ChartData[]>;
 }
 
 const VisitorsChart = ({ data }: VisitorsChartProps) => {
+  const chartData = use(data);
+
   return (
     <Card>
       <CardHeader>
@@ -44,7 +48,7 @@ const VisitorsChart = ({ data }: VisitorsChartProps) => {
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"
         >
-          <AreaChart data={data}>
+          <AreaChart data={chartData}>
             <defs>
               <linearGradient id="fillClicks" x1="0" y1="0" x2="0" y2="1">
                 <stop
