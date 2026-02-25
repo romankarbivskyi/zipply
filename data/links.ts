@@ -258,7 +258,6 @@ export const getDashboardMetrics = async (
     prisma.link.count({
       where: {
         userId: session.user.id,
-        createdAt: { gte: startDate },
       },
     }),
     prisma.click.count({

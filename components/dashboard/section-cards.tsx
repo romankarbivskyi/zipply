@@ -39,7 +39,7 @@ const SectionCards = ({ data, timeRange }: SectionCardsProps) => {
         </CardHeader>
         <CardFooter>
           <p className="text-muted-foreground line-clamp-1 text-sm">
-            Total links created in {periodLabel}
+            Total links created
           </p>
         </CardFooter>
       </Card>
