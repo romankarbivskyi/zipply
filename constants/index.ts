@@ -36,9 +36,10 @@ export const DASHBOARD_NAVIGATION: {
       },
     ],
   },
-  {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: SlidersHorizontal,
-  },
+  // TODO: add settings page later when we have subscriptions
+  // {
+  //   title: "Settings",
+  //   href: "/dashboard/settings",
+  //   icon: SlidersHorizontal,
+  // },
 ];
