@@ -1,17 +1,30 @@
 "use client";
 
 import { useActionState } from "react";
-import { createLink } from "@/actions/links";
+import { createLink, updateLink } from "@/actions/links";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IconLoader2 } from "@tabler/icons-react";
+import type { Link } from "@/lib/generated/prisma/client";
 
-const CreateLinkForm = () => {
+interface LinkFormProps {
+  type?: "create" | "edit";
+  link?: Link;
+}
+
+const LinkForm = ({ type = "create", link }: LinkFormProps) => {
   const [state, action, isPending] = useActionState(
     async (_prev: { error: string } | null, formData: FormData) => {
-      const result = await createLink(formData);
+      if (type === "edit" && (!link || !link.id)) {
+        return null;
+      }
+
+      const result =
+        type === "edit"
+          ? await updateLink(link!.id, formData)
+          : await createLink(formData);
       return result ?? null;
     },
     null,
@@ -20,7 +33,7 @@ const CreateLinkForm = () => {
   return (
     <Card className="mx-auto w-full max-w-lg">
       <CardHeader>
-        <CardTitle>Create Short Link</CardTitle>
+        <CardTitle>{type === "create" ? "Create" : "Edit"} Link</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={action} className="flex flex-col gap-4">
@@ -31,6 +44,7 @@ const CreateLinkForm = () => {
               name="url"
               type="url"
               placeholder="https://example.com/very-long-url"
+              defaultValue={link?.originalUrl}
               required
             />
           </div>
@@ -47,6 +61,7 @@ const CreateLinkForm = () => {
               name="shortCode"
               placeholder="my-link"
               maxLength={20}
+              defaultValue={link?.shortCode}
             />
             <p className="text-muted-foreground text-xs">
               Leave empty to auto-generate. Letters, numbers, hyphens, and
@@ -60,7 +75,13 @@ const CreateLinkForm = () => {
 
           <Button type="submit" disabled={isPending} className="w-full">
             {isPending && <IconLoader2 className="size-4 animate-spin" />}
-            {isPending ? "Creating..." : "Create Link"}
+            {isPending && type === "create"
+              ? "Creating..."
+              : isPending && type === "edit"
+                ? "Updating..."
+                : type === "create"
+                  ? "Create Link"
+                  : "Update Link"}
           </Button>
         </form>
       </CardContent>
@@ -68,4 +89,4 @@ const CreateLinkForm = () => {
   );
 };
 
-export default CreateLinkForm;
+export default LinkForm;

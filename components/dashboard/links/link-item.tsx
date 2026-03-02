@@ -59,7 +59,7 @@ const LinkItem = ({ link }: LinkItemProps) => {
                 <CardDescription>
                   <Link
                     href={link.originalUrl}
-                    className="flex items-center gap-1.5 truncate text-xs"
+                    className="flex max-w-xs items-center gap-1.5 truncate text-xs"
                     target="_blank"
                     onClick={(e) => e.stopPropagation()}
                   >
