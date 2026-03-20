@@ -74,6 +74,8 @@ model Verification {
 model Link {
   id          String   @id @default(cuid())
   originalUrl String
+  title       String
+  favicon     String?
   shortCode   String   @unique
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -92,6 +94,8 @@ model Click {
   link   Link   @relation(fields: [linkId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+
+  ipAddress String?
 
   country String?
   city    String?

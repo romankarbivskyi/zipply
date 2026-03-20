@@ -1,6 +1,6 @@
 "use client";
 
-import { authSchema, AuthSchema } from "@/schemas/auth";
+import { getAuthSchema } from "@/schemas/auth";
 import { GoogleIcon } from "./icons";
 import { Button } from "./ui/button";
 import {
@@ -21,6 +21,7 @@ import { authClient } from "@/lib/auth-client";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import z from "zod";
 
 interface AuthFormProps {
   type: "sign-in" | "sign-up";
@@ -29,11 +30,13 @@ interface AuthFormProps {
 const AuthForm = ({ type }: AuthFormProps) => {
   const isSignIn = type === "sign-in";
 
+  const authSchema = getAuthSchema(type);
+
   const [isPending, startTransition] = useTransition();
 
   const router = useRouter();
 
-  const form = useForm<AuthSchema>({
+  const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
     defaultValues: {
       email: "",
@@ -44,10 +47,11 @@ const AuthForm = ({ type }: AuthFormProps) => {
   const handleGoogleSignIn = async () => {
     await authClient.signIn.social({
       provider: "google",
+      callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`,
     });
   };
 
-  const handleSubmit = ({ email, password }: AuthSchema) => {
+  const handleSubmit = ({ email, password }: z.infer<typeof authSchema>) => {
     startTransition(async () => {
       try {
         if (isSignIn) {
@@ -71,7 +75,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
 
           if (error) throw new Error(error.message);
 
-          router.push("/");
+          router.push("/dashboard");
         }
       } catch (error) {
         toast.error(
@@ -84,7 +88,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
   };
 
   return (
-    <Card className="max-w-md w-full">
+    <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-2xl">
           {isSignIn ? "👋 Welcome back" : "Create an account"}
@@ -107,12 +111,12 @@ const AuthForm = ({ type }: AuthFormProps) => {
 
         <div className="flex items-center gap-1">
           <Separator className="flex-1" />
-          <span className="text-sm text-muted-foreground">OR</span>
+          <span className="text-muted-foreground text-sm">OR</span>
           <Separator className="flex-1" />
         </div>
 
         <form id="auth-form" onSubmit={form.handleSubmit(handleSubmit)}>
-          <FieldGroup className="">
+          <FieldGroup className="gap-4">
             <Controller
               name="email"
               control={form.control}
@@ -151,6 +155,29 @@ const AuthForm = ({ type }: AuthFormProps) => {
                 </Field>
               )}
             />
+            {!isSignIn && (
+              <Controller
+                name="confirmPassword"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Confirm Password
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="password"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Confirm your password"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            )}
           </FieldGroup>
         </form>
       </CardContent>
@@ -165,7 +192,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
         </Button>
         <Link
           href={isSignIn ? "/sign-up" : "/sign-in"}
-          className="text-sm text-muted-foreground hover:underline"
+          className="text-muted-foreground text-sm hover:underline"
         >
           {isSignIn
             ? "Don't have an account? Sign Up"
