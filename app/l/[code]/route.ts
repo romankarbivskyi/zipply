@@ -7,18 +7,26 @@ import { NextResponse, after } from "next/server";
 
 const saveClickToDatabase = async (linkId: string, stats: RequestContext) => {
   try {
-    await prisma.click.create({
-      data: {
-        linkId,
-        ipAddress: stats.ip,
-        country: stats.country,
-        city: stats.city,
-        device: stats.device,
-        browser: stats.browser,
-        os: stats.os,
-        referrer: stats.referrer,
-      },
-    });
+    await prisma.$transaction([
+      prisma.click.create({
+        data: {
+          linkId,
+          ipAddress: stats.ip,
+          country: stats.country,
+          city: stats.city,
+          device: stats.device,
+          browser: stats.browser,
+          os: stats.os,
+          referrer: stats.referrer,
+        },
+      }),
+      prisma.link.update({
+        where: { id: linkId },
+        data: {
+          clicks: { increment: 1 },
+        },
+      }),
+    ]);
   } catch (error) {
     console.error("Failed to store click event", { linkId, error });
   }
