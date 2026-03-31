@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
 import { CartesianGrid, XAxis, Area, AreaChart } from "recharts";
 import {
@@ -112,13 +111,13 @@ const VisitorsChart = ({ data }: VisitorsChartProps) => {
             />
             <Area
               dataKey="clicks"
-              type="natural"
+              type="monotone"
               fill="url(#fillClicks)"
               stroke="var(--color-clicks)"
             />
             <Area
               dataKey="uniqueVisitors"
-              type="natural"
+              type="monotone"
               fill="url(#fillUniqueVisitors)"
               stroke="var(--color-uniqueVisitors)"
             />

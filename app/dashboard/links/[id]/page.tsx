@@ -12,7 +12,6 @@ import LinkCard from "@/components/dashboard/links/link-card";
 import {
   getClicksOverTime,
   getCountriesData,
-  getDashboardMetrics,
   getDevicesData,
   getLinkById,
 } from "@/data/links";
@@ -38,8 +37,6 @@ export default async function Page({
   const clicksData = getClicksOverTime(timeRange);
   const countriesData = getCountriesData(timeRange);
   const devicesData = getDevicesData(timeRange);
-
-  const metrics = getDashboardMetrics(timeRange);
 
   return (
     <div className="flex flex-1 flex-col">

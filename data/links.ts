@@ -71,6 +71,20 @@ export async function fetchLinksPages(search: string) {
   return Math.ceil(count / LINKS_PER_PAGE);
 }
 
+export const getLinkByShortCode = async (
+  shortCode: string,
+): Promise<Link | null> => {
+  try {
+    const link = await prisma.link.findUnique({
+      where: { shortCode },
+    });
+
+    return link;
+  } catch {
+    return null;
+  }
+};
+
 export const getLinkById = async (id: string): Promise<Link | null> => {
   const session = await auth.api.getSession({
     headers: await headers(),

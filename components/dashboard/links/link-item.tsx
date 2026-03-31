@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatDate, formatNumberWithSuffix } from "@/lib/utils";
+import { formatDate, formatNumberWithSuffix, getShortLink } from "@/lib/utils";
 import {
   IconExternalLink,
   IconClick,
@@ -26,7 +26,7 @@ interface LinkItemProps {
 }
 
 const LinkItem = ({ link }: LinkItemProps) => {
-  const shortUrl = `${process.env.NEXT_PUBLIC_BASE_URL || ""}/${link.shortCode}`;
+  const shortUrl = getShortLink(link.shortCode);
 
   const router = useRouter();
 
