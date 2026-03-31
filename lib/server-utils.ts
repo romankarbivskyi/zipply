@@ -5,10 +5,10 @@ import { userAgentFromString } from "next/server";
 
 type ArcjetDecision = Awaited<ReturnType<typeof aj.protect>>;
 
-export async function getUserStats(
+export const getUserStats = async (
   req: Request,
   decision?: ArcjetDecision,
-): Promise<RequestContext> {
+): Promise<RequestContext> => {
   const arcjetDecision = decision ?? (await aj.protect(req));
   const publicIp = ajIp(req);
 
@@ -28,4 +28,20 @@ export async function getUserStats(
     browser: browser.name || "Unknown",
     referrer,
   };
-}
+};
+
+export const getRequestDiagnostics = (req: Request) => {
+  const headers = req.headers;
+
+  return {
+    method: req.method,
+    purpose: headers.get("purpose") || "",
+    secPurpose: headers.get("sec-purpose") || "",
+    secFetchMode: headers.get("sec-fetch-mode") || "",
+    secFetchDest: headers.get("sec-fetch-dest") || "",
+    secFetchSite: headers.get("sec-fetch-site") || "",
+    secFetchUser: headers.get("sec-fetch-user") || "",
+    referer: headers.get("referer") || "",
+    userAgent: headers.get("user-agent") || "",
+  };
+};
