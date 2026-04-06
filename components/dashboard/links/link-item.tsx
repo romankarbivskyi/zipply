@@ -8,7 +8,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatDate, formatNumberWithSuffix, getShortLink } from "@/lib/utils";
+import {
+  cn,
+  formatDate,
+  formatNumberWithSuffix,
+  getShortLink,
+} from "@/lib/utils";
 import {
   IconExternalLink,
   IconClick,
@@ -20,27 +25,55 @@ import Link from "next/link";
 import Image from "next/image";
 import { CopyButton } from "@/components/copy-button";
 import { useRouter } from "next/navigation";
+import { useRef } from "react";
+import { useSelection } from "@/hooks/use-selection";
 
 interface LinkItemProps {
   link: LinkType;
 }
 
 const LinkItem = ({ link }: LinkItemProps) => {
-  const shortUrl = getShortLink(link.shortCode);
+  const cardRef = useRef<HTMLDivElement>(null);
 
+  const { isSelected, hasSelection, toggleSelect, consumeLongPressSelection } =
+    useSelection({ cardRef, linkId: link.id });
   const router = useRouter();
+
+  const shortUrl = getShortLink(link.shortCode);
 
   const goToDetails = () => router.push(`/dashboard/links/${link.id}`);
 
   return (
     <Card
-      className="group transition-shadow hover:shadow-md"
+      className={cn("group transition-shadow hover:shadow-md", {
+        "border-white": isSelected,
+      })}
       role="link"
       tabIndex={0}
-      onClick={goToDetails}
+      ref={cardRef}
+      onClick={(e) => {
+        if (consumeLongPressSelection()) {
+          e.preventDefault();
+          return;
+        }
+
+        if (hasSelection) {
+          e.preventDefault();
+          toggleSelect(link.id);
+          return;
+        }
+
+        goToDetails();
+      }}
       onKeyDown={(e) => {
         if (e.key == "Enter" || e.key === " ") {
           e.preventDefault();
+
+          if (hasSelection) {
+            toggleSelect(link.id);
+            return;
+          }
+
           goToDetails();
         }
       }}

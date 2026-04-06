@@ -1,4 +1,4 @@
-import { Code2, Home, LinkIcon, SlidersHorizontal } from "lucide-react";
+import { Code2, Home, LinkIcon } from "lucide-react";
 
 export const DASHBOARD_NAVIGATION: {
   title: string;
@@ -43,3 +43,5 @@ export const DASHBOARD_NAVIGATION: {
   //   icon: SlidersHorizontal,
   // },
 ];
+
+export const LINKS_PER_PAGE = 5;
