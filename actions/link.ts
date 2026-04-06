@@ -107,7 +107,7 @@ export const updateLink = async (id: string, formData: FormData) => {
   redirect("/dashboard/links");
 };
 
-export const deleteLink = async (id: string) => {
+export const deleteLinks = async (ids: string[]) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -116,8 +116,8 @@ export const deleteLink = async (id: string) => {
     return { error: "Unauthorized" };
   }
 
-  await prisma.link.delete({
-    where: { id },
+  await prisma.link.deleteMany({
+    where: { id: { in: ids }, userId: session.user.id },
   });
 
   redirect("/dashboard/links");

@@ -22,7 +22,7 @@ import Image from "next/image";
 import { CopyButton } from "@/components/copy-button";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import { deleteLink } from "@/actions/links";
+import { deleteLinks } from "@/actions/link";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -38,7 +38,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
 
   const handleDelete = () => {
     startTransition(async () => {
-      const res = await deleteLink(link.id);
+      const res = await deleteLinks([link.id]);
       if (res?.error) {
         toast.error(res.error);
         return;

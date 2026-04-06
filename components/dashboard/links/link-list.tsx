@@ -1,17 +1,14 @@
-import { fetchFilteredLinks } from "@/data/links";
 import LinkItem from "./link-item";
 import { IconPlus } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Link as LinkType } from "@/lib/generated/prisma/client";
 
 interface LinkListProps {
-  search: string;
-  currentPage: number;
+  links: LinkType[];
 }
 
-const LinkList = async ({ search, currentPage }: LinkListProps) => {
-  const links = await fetchFilteredLinks(search, currentPage);
-
+const LinkList = async ({ links }: LinkListProps) => {
   if (links.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-16">

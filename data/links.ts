@@ -2,8 +2,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Link } from "@/lib/generated/prisma/client";
-
-const LINKS_PER_PAGE = 10;
+import { LINKS_PER_PAGE } from "@/constants";
 
 export interface DashboardMetrics {
   totalLinks: number;
@@ -45,13 +44,13 @@ export const fetchFilteredLinks = async (
   return links;
 };
 
-export async function fetchLinksPages(search: string) {
+export const fetchLinksPages = async (search: string) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session) {
-    return 0;
+    return { totalPages: 0, totalLinks: 0 };
   }
 
   const count = await prisma.link.count({
@@ -68,8 +67,11 @@ export async function fetchLinksPages(search: string) {
     },
   });
 
-  return Math.ceil(count / LINKS_PER_PAGE);
-}
+  return {
+    totalPages: Math.ceil(count / LINKS_PER_PAGE),
+    totalLinks: count,
+  };
+};
 
 export const getLinkByShortCode = async (
   shortCode: string,
