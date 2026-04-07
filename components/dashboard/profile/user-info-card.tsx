@@ -23,7 +23,7 @@ const UserInfoCard = async () => {
   }
 
   return (
-    <Card className="from-background to-card/50 bg-linear-to-b">
+    <Card>
       <CardHeader>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="bg-muted flex size-16 shrink-0 items-center justify-center rounded-full border">
