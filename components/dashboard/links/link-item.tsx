@@ -46,7 +46,7 @@ const LinkItem = ({ link }: LinkItemProps) => {
   return (
     <Card
       className={cn("group transition-shadow hover:shadow-md", {
-        "border-white": isSelected,
+        "border-primary border-2": isSelected,
       })}
       role="link"
       tabIndex={0}
