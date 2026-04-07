@@ -64,7 +64,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
     <Card className="from-background to-card/50 bg-linear-to-b">
       <CardHeader className="grid-cols-1 sm:has-data-[slot=card-action]:grid-cols-[1fr_auto]">
         <div className="flex items-start gap-4">
-          <div className="bg-muted flex size-12 shrink-0 items-center justify-center rounded-xl">
+          <div className="bg-muted xs:flex hidden size-12 shrink-0 items-center justify-center rounded-xl">
             {link.favicon ? (
               <Image
                 src={link.favicon}
@@ -77,17 +77,17 @@ const LinkCard = ({ link }: LinkCardProps) => {
               <IconWorld className="text-muted-foreground size-6" />
             )}
           </div>
-          <div className="min-w-0 flex-1 space-y-1">
-            <CardTitle className="text-lg font-semibold">
+          <div className="min-w-0flex-1 max-w-4/5 space-y-1">
+            <CardTitle className="truncate text-lg font-semibold">
               {link.title}
             </CardTitle>
-            <CardDescription className="flex items-center gap-1.5">
+            <CardDescription className="flex min-w-0 items-center gap-1.5">
               <IconExternalLink className="size-3.5 shrink-0" />
               <a
                 href={link.originalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-foreground truncate transition-colors hover:underline"
+                className="hover:text-foreground min-w-0 truncate transition-colors hover:underline"
               >
                 {link.originalUrl}
               </a>
@@ -95,7 +95,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
           </div>
         </div>
 
-        <CardAction className="col-start-1 row-start-auto space-x-2 justify-self-start sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:justify-self-end">
+        <CardAction className="col-start-1 row-start-auto space-x-2 justify-self-start lg:col-start-2">
           <Dialog>
             <DialogTrigger>
               <Button variant="outline" size="sm">
@@ -140,9 +140,13 @@ const LinkCard = ({ link }: LinkCardProps) => {
       </CardHeader>
       <CardContent>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-primary font-mono text-sm">{shortUrl}</span>
-            <CopyButton text={shortUrl} />
+          <div className="flex min-w-0 items-center gap-1.5">
+            <span className="text-primary min-w-0 truncate font-mono text-sm">
+              {shortUrl}
+            </span>
+            <div className="shrink-0">
+              <CopyButton text={shortUrl} />
+            </div>
           </div>
           <Badge variant="secondary" className="gap-1">
             <IconClick className="size-3.5" />

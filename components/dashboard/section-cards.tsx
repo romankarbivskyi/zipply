@@ -27,7 +27,7 @@ const SectionCards = ({ data, timeRange }: SectionCardsProps) => {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <Card className="from-background to-card/50 @container/card bg-linear-to-b">
+      <Card>
         <CardHeader>
           <CardDescription className="flex items-center gap-1.5">
             <IconLink className="text-primary size-4" />
@@ -44,7 +44,7 @@ const SectionCards = ({ data, timeRange }: SectionCardsProps) => {
         </CardFooter>
       </Card>
 
-      <Card className="from-background to-card/50 @container/card bg-linear-to-b">
+      <Card>
         <CardHeader>
           <CardDescription className="flex items-center gap-1.5">
             <IconClick className="text-primary size-4" />
@@ -62,7 +62,7 @@ const SectionCards = ({ data, timeRange }: SectionCardsProps) => {
         </CardFooter>
       </Card>
 
-      <Card className="from-background to-card/50 @container/card bg-linear-to-b">
+      <Card>
         <CardHeader>
           <CardDescription className="flex items-center gap-1.5">
             <IconUsers className="text-primary size-4" />

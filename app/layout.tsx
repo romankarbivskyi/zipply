@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="dark antialiased min-h-screen flex">
+      <body className="flex min-h-screen antialiased">
         {children}
         <Toaster />
       </body>

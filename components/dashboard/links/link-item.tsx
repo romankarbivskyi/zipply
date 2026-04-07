@@ -45,8 +45,8 @@ const LinkItem = ({ link }: LinkItemProps) => {
 
   return (
     <Card
-      className={cn("group transition-shadow hover:shadow-md", {
-        "border-white": isSelected,
+      className={cn("group cursor-pointer transition-shadow hover:shadow-md", {
+        "border-primary border-2": isSelected,
       })}
       role="link"
       tabIndex={0}
@@ -81,7 +81,7 @@ const LinkItem = ({ link }: LinkItemProps) => {
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 flex-1 items-start gap-3">
-            <div className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-lg">
+            <div className="bg-muted xs:flex hidden size-10 shrink-0 items-center justify-center rounded-lg">
               {link.favicon ? (
                 <Image
                   src={link.favicon}
@@ -94,42 +94,44 @@ const LinkItem = ({ link }: LinkItemProps) => {
                 <IconWorld className="text-muted-foreground size-5" />
               )}
             </div>
-            <div className="min-w-0 flex-1 space-y-1">
-              <CardTitle className="truncate text-sm font-semibold">
+            <div className="min-w-0 space-y-1">
+              <CardTitle className="max-w-4/5 min-w-0 truncate text-sm font-semibold">
                 {link.title}
               </CardTitle>
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
                 <span className="text-primary truncate font-mono text-xs">
                   {shortUrl}
                 </span>
-                <CopyButton text={shortUrl} />
+                <div className="shrink-0">
+                  <CopyButton text={shortUrl} />
+                </div>
               </div>
-              <CardDescription>
+              <CardDescription className="min-w-0">
                 <Link
                   href={link.originalUrl}
-                  className="flex max-w-xs items-center gap-1.5 truncate text-xs"
+                  className="flex min-w-0 items-center gap-1.5 text-xs"
                   target="_blank"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <IconExternalLink className="size-3 shrink-0" />
-                  <span className="truncate hover:underline">
+                  <span className="min-w-0 flex-1 truncate hover:underline">
                     {link.originalUrl}
                   </span>
                 </Link>
               </CardDescription>
             </div>
           </div>
-          <Badge variant="secondary" className="shrink-0 gap-1">
-            <IconClick className="size-3.5" />
-            {formatNumberWithSuffix(link.clicks)}
-          </Badge>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex items-center justify-between">
         <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
           <IconCalendar className="size-3.5" />
           {formatDate(link.createdAt)}
         </div>
+        <Badge variant="secondary" className="shrink-0 gap-1">
+          <IconClick className="size-3.5" />
+          {formatNumberWithSuffix(link.clicks)}
+        </Badge>
       </CardContent>
     </Card>
   );
