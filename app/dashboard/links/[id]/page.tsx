@@ -34,9 +34,9 @@ export default async function Page({
     notFound();
   }
 
-  const clicksData = getClicksOverTime(timeRange);
-  const countriesData = getCountriesData(timeRange);
-  const devicesData = getDevicesData(timeRange);
+  const clicksData = getClicksOverTime(timeRange, linkId);
+  const countriesData = getCountriesData(timeRange, linkId);
+  const devicesData = getDevicesData(timeRange, linkId);
 
   return (
     <div className="flex flex-1 flex-col">
