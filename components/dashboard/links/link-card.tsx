@@ -21,11 +21,20 @@ import type { Link as LinkType } from "@/lib/generated/prisma/client";
 import Image from "next/image";
 import { CopyButton } from "@/components/copy-button";
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
+import { QrCode, Trash } from "lucide-react";
 import { deleteLinks } from "@/actions/link";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import QRCode from "react-qr-code";
 
 interface LinkCardProps {
   link: LinkType;
@@ -87,6 +96,25 @@ const LinkCard = ({ link }: LinkCardProps) => {
         </div>
 
         <CardAction className="col-start-1 row-start-auto space-x-2 justify-self-start sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:justify-self-end">
+          <Dialog>
+            <DialogTrigger>
+              <Button variant="outline" size="sm">
+                <QrCode /> QR Code
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>QR Code</DialogTitle>
+                <DialogDescription>
+                  Scan the QR code below to visit the link.
+                </DialogDescription>
+                <QRCode
+                  value={shortUrl}
+                  className="mx-auto mt-2 max-h-50 max-w-50 border-2 border-white"
+                />
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
           <Button
             variant="outline"
             size="sm"
