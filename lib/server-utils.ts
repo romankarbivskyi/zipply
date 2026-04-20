@@ -1,32 +1,24 @@
-import { aj } from "@/lib/arcjet";
 import type { RequestContext } from "@/types/request";
-import ajIp from "@arcjet/ip";
 import { userAgentFromString } from "next/server";
+import { ipAddress, geolocation } from "@vercel/functions";
 
-type ArcjetDecision = Awaited<ReturnType<typeof aj.protect>>;
-
-export const getUserStats = async (
+export const getRequestContext = async (
   req: Request,
-  decision?: ArcjetDecision,
 ): Promise<RequestContext> => {
-  const arcjetDecision = decision ?? (await aj.protect(req));
-  const publicIp = ajIp(req);
+  const publicIp = ipAddress(req);
+  const geo = geolocation(req);
 
   const uaString = req.headers.get("user-agent") || "";
-  const referrer = req.headers.get("referer") || "Direct / No Referrer";
 
   const { os, browser, device } = userAgentFromString(uaString);
 
   return {
     ip: publicIp || undefined,
-    country: arcjetDecision.ip.hasCountry()
-      ? arcjetDecision.ip.countryName
-      : "Unknown",
-    city: arcjetDecision.ip.city || "Unknown",
+    country: geo.country || "Unknown",
+    city: geo.city || "Unknown",
     os: os.name || "Unknown",
     device: device.type || "Unknown",
     browser: browser.name || "Unknown",
-    referrer,
   };
 };
 

@@ -5,5 +5,4 @@ export interface RequestContext {
   os: string;
   device: string;
   browser: string;
-  referrer: string;
 }

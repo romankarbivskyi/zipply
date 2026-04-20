@@ -1,9 +1,12 @@
 import { getLinkByShortCode } from "@/data/links";
-import { aj } from "@/lib/arcjet";
 import { prisma } from "@/lib/db";
-import { getRequestDiagnostics, getUserStats } from "@/lib/server-utils";
-import type { RequestContext } from "@/types/request";
+import { getRequestContext, getRequestDiagnostics } from "@/lib/server-utils";
 import { NextResponse, after } from "next/server";
+import crypto from "node:crypto";
+import { tinybird } from "@/lib/tinybird";
+
+const sha256 = (value: string) =>
+  crypto.createHash("sha256").update(value).digest("hex");
 
 const hasToken = (value: string, token: string) => {
   return value
@@ -37,55 +40,49 @@ const shouldTrackClick = (
   return true;
 };
 
-const saveClickToDatabase = async (linkId: string, stats: RequestContext) => {
+const saveClickEvent = async (
+  linkId: string,
+  userId: string,
+  request: Request,
+) => {
   try {
-    const duplicateWhere = stats.ip
-      ? {
-          linkId,
-          ipAddress: stats.ip,
-          createdAt: {
-            gte: new Date(Date.now() - 1000),
-          },
-        }
-      : {
-          linkId,
-          browser: stats.browser,
-          os: stats.os,
-          device: stats.device,
-          referrer: stats.referrer,
-          createdAt: {
-            gte: new Date(Date.now() - 1000),
-          },
-        };
+    const stats = await getRequestContext(request);
 
-    const recentClick = await prisma.click.findFirst({
-      where: duplicateWhere,
-      select: { id: true },
-    });
+    const ts = new Date();
 
-    if (recentClick) {
-      return;
-    }
+    const base = [
+      linkId,
+      stats.ip ?? "",
+      stats.browser,
+      stats.os,
+      stats.device,
+      Math.floor(ts.getTime() / 1000),
+    ].join("|");
 
-    await prisma.$transaction([
-      prisma.click.create({
-        data: {
-          linkId,
-          ipAddress: stats.ip,
-          country: stats.country,
-          city: stats.city,
-          device: stats.device,
-          browser: stats.browser,
-          os: stats.os,
-          referrer: stats.referrer,
-        },
-      }),
-      prisma.link.update({
-        where: { id: linkId },
-        data: {
-          clicks: { increment: 1 },
-        },
-      }),
+    const eventId = sha256(base);
+
+    await Promise.all([
+      tinybird.clicks
+        .ingest({
+          event_id: eventId,
+          ts: ts.toISOString(),
+          link_id: linkId,
+          user_id: userId,
+          ip_hash: stats.ip ? sha256(stats.ip) : null,
+          country: stats.country ?? "Unknown",
+          city: stats.city ?? "Unknown",
+          device: stats.device ?? "Unknown",
+          browser: stats.browser ?? "Unknown",
+          os: stats.os ?? "Unknown",
+        })
+        .catch((err) => console.error("Tinybird ingest failed:", err)),
+
+      prisma.link
+        .update({
+          where: { id: linkId },
+          data: { clicks: { increment: 1 } },
+        })
+        .catch((err) => console.error("Prisma update failed:", err)),
     ]);
   } catch (error) {
     console.error("Failed to store click event", { linkId, error });
@@ -97,14 +94,6 @@ export const GET = async (
   { params }: { params: Promise<{ code: string }> },
 ) => {
   const { code } = await params;
-  const diagnostics = getRequestDiagnostics(request);
-  const trackClick = shouldTrackClick(diagnostics);
-
-  const decision = await aj.protect(request);
-
-  if (decision.isDenied()) {
-    return new Response("Request blocked", { status: 403 });
-  }
 
   const link = await getLinkByShortCode(code);
 
@@ -112,15 +101,16 @@ export const GET = async (
     return new Response("Not Found", { status: 404 });
   }
 
-  const stats = await getUserStats(request, decision);
+  const diagnostic = await getRequestDiagnostics(request);
+  if (!shouldTrackClick(diagnostic)) {
+    return NextResponse.redirect(link.originalUrl);
+  }
 
   const targetUrl = link.originalUrl;
 
-  if (trackClick) {
-    after(() => {
-      saveClickToDatabase(link.id, stats);
-    });
-  }
+  after(() => {
+    saveClickEvent(link.id, link.userId, request);
+  });
 
   return NextResponse.redirect(targetUrl);
 };
