@@ -1,91 +1,56 @@
 import { getLinkByShortCode } from "@/data/links";
 import { aj } from "@/lib/arcjet";
 import { prisma } from "@/lib/db";
-import { getRequestDiagnostics, getUserStats } from "@/lib/server-utils";
+import { getUserStats } from "@/lib/server-utils";
 import type { RequestContext } from "@/types/request";
 import { NextResponse, after } from "next/server";
+import crypto from "node:crypto";
+import { tinybird } from "@/lib/tinybird";
 
-const hasToken = (value: string, token: string) => {
-  return value
-    .toLowerCase()
-    .split(/[\s,;]+/)
-    .filter(Boolean)
-    .includes(token);
-};
+const sha256 = (value: string) =>
+  crypto.createHash("sha256").update(value).digest("hex");
 
-const shouldTrackClick = (
-  diagnostics: ReturnType<typeof getRequestDiagnostics>,
+const saveClickEvent = async (
+  linkId: string,
+  userId: string,
+  stats: RequestContext,
 ) => {
-  const isPrefetchLike =
-    hasToken(diagnostics.purpose, "prefetch") ||
-    hasToken(diagnostics.secPurpose, "prefetch") ||
-    hasToken(diagnostics.secPurpose, "prerender") ||
-    hasToken(diagnostics.purpose, "prerender");
-
-  if (isPrefetchLike) {
-    return false;
-  }
-
-  if (diagnostics.secFetchMode && diagnostics.secFetchMode !== "navigate") {
-    return false;
-  }
-
-  if (diagnostics.secFetchDest && diagnostics.secFetchDest !== "document") {
-    return false;
-  }
-
-  return true;
-};
-
-const saveClickToDatabase = async (linkId: string, stats: RequestContext) => {
   try {
-    const duplicateWhere = stats.ip
-      ? {
-          linkId,
-          ipAddress: stats.ip,
-          createdAt: {
-            gte: new Date(Date.now() - 1000),
-          },
-        }
-      : {
-          linkId,
-          browser: stats.browser,
-          os: stats.os,
-          device: stats.device,
-          referrer: stats.referrer,
-          createdAt: {
-            gte: new Date(Date.now() - 1000),
-          },
-        };
+    const ts = new Date();
 
-    const recentClick = await prisma.click.findFirst({
-      where: duplicateWhere,
-      select: { id: true },
-    });
+    const base = [
+      linkId,
+      stats.ip ?? "",
+      stats.browser,
+      stats.os,
+      stats.device,
+      Math.floor(ts.getTime() / 1000),
+    ].join("|");
 
-    if (recentClick) {
-      return;
-    }
+    const eventId = sha256(base);
 
-    await prisma.$transaction([
-      prisma.click.create({
-        data: {
-          linkId,
-          ipAddress: stats.ip,
-          country: stats.country,
-          city: stats.city,
-          device: stats.device,
-          browser: stats.browser,
-          os: stats.os,
-          referrer: stats.referrer,
-        },
-      }),
-      prisma.link.update({
-        where: { id: linkId },
-        data: {
-          clicks: { increment: 1 },
-        },
-      }),
+    await Promise.all([
+      tinybird.clicks
+        .ingest({
+          event_id: eventId,
+          ts: ts.toISOString(),
+          link_id: linkId,
+          user_id: userId,
+          ip_hash: stats.ip ? sha256(stats.ip) : null,
+          country: stats.country ?? "Unknown",
+          city: stats.city ?? "Unknown",
+          device: stats.device ?? "Unknown",
+          browser: stats.browser ?? "Unknown",
+          os: stats.os ?? "Unknown",
+        })
+        .catch((err) => console.error("Tinybird ingest failed:", err)),
+
+      prisma.link
+        .update({
+          where: { id: linkId },
+          data: { clicks: { increment: 1 } },
+        })
+        .catch((err) => console.error("Prisma update failed:", err)),
     ]);
   } catch (error) {
     console.error("Failed to store click event", { linkId, error });
@@ -97,8 +62,6 @@ export const GET = async (
   { params }: { params: Promise<{ code: string }> },
 ) => {
   const { code } = await params;
-  const diagnostics = getRequestDiagnostics(request);
-  const trackClick = shouldTrackClick(diagnostics);
 
   const decision = await aj.protect(request);
 
@@ -116,11 +79,9 @@ export const GET = async (
 
   const targetUrl = link.originalUrl;
 
-  if (trackClick) {
-    after(() => {
-      saveClickToDatabase(link.id, stats);
-    });
-  }
+  after(() => {
+    saveClickEvent(link.id, link.userId, stats);
+  });
 
   return NextResponse.redirect(targetUrl);
 };
