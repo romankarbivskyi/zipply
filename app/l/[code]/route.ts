@@ -1,8 +1,6 @@
 import { getLinkByShortCode } from "@/data/links";
-import { aj } from "@/lib/arcjet";
 import { prisma } from "@/lib/db";
-import { getUserStats } from "@/lib/server-utils";
-import type { RequestContext } from "@/types/request";
+import { getRequestContext, getRequestDiagnostics } from "@/lib/server-utils";
 import { NextResponse, after } from "next/server";
 import crypto from "node:crypto";
 import { tinybird } from "@/lib/tinybird";
@@ -10,12 +8,46 @@ import { tinybird } from "@/lib/tinybird";
 const sha256 = (value: string) =>
   crypto.createHash("sha256").update(value).digest("hex");
 
+const hasToken = (value: string, token: string) => {
+  return value
+    .toLowerCase()
+    .split(/[\s,;]+/)
+    .filter(Boolean)
+    .includes(token);
+};
+
+const shouldTrackClick = (
+  diagnostics: ReturnType<typeof getRequestDiagnostics>,
+) => {
+  const isPrefetchLike =
+    hasToken(diagnostics.purpose, "prefetch") ||
+    hasToken(diagnostics.secPurpose, "prefetch") ||
+    hasToken(diagnostics.secPurpose, "prerender") ||
+    hasToken(diagnostics.purpose, "prerender");
+
+  if (isPrefetchLike) {
+    return false;
+  }
+
+  if (diagnostics.secFetchMode && diagnostics.secFetchMode !== "navigate") {
+    return false;
+  }
+
+  if (diagnostics.secFetchDest && diagnostics.secFetchDest !== "document") {
+    return false;
+  }
+
+  return true;
+};
+
 const saveClickEvent = async (
   linkId: string,
   userId: string,
-  stats: RequestContext,
+  request: Request,
 ) => {
   try {
+    const stats = await getRequestContext(request);
+
     const ts = new Date();
 
     const base = [
@@ -63,24 +95,21 @@ export const GET = async (
 ) => {
   const { code } = await params;
 
-  const decision = await aj.protect(request);
-
-  if (decision.isDenied()) {
-    return new Response("Request blocked", { status: 403 });
-  }
-
   const link = await getLinkByShortCode(code);
 
   if (!link) {
     return new Response("Not Found", { status: 404 });
   }
 
-  const stats = await getUserStats(request, decision);
+  const diagnostic = await getRequestDiagnostics(request);
+  if (!shouldTrackClick(diagnostic)) {
+    return NextResponse.redirect(link.originalUrl);
+  }
 
   const targetUrl = link.originalUrl;
 
   after(() => {
-    saveClickEvent(link.id, link.userId, stats);
+    saveClickEvent(link.id, link.userId, request);
   });
 
   return NextResponse.redirect(targetUrl);
