@@ -26,13 +26,13 @@ export const DASHBOARD_NAVIGATION: {
     icon: LinkIcon,
   },
   {
-    title: "API Keys",
-    href: "/dashboard/api-keys",
+    title: "API",
+    href: "/dashboard/api",
     icon: Code2,
     tags: [
       {
-        title: "Soon",
-        variant: "secondary",
+        title: "New",
+        variant: "default",
       },
     ],
   },

@@ -102,9 +102,7 @@ const LinkItem = ({ link }: LinkItemProps) => {
                 <span className="text-primary truncate font-mono text-xs">
                   {shortUrl}
                 </span>
-                <div className="shrink-0">
-                  <CopyButton text={shortUrl} />
-                </div>
+                <CopyButton text={shortUrl} size="xs" variant="ghost" />
               </div>
               <CardDescription className="min-w-0">
                 <Link
