@@ -39,3 +39,50 @@ export const createApiKey = async (data: ApiKeyInput) => {
 
   return { success: true, key };
 };
+
+export const updateApiKey = async (id: string, data: ApiKeyInput) => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return { error: "Unauthorized" };
+  }
+
+  const validatedData = apiKeySchema.safeParse(data);
+
+  if (!validatedData.success) {
+    return { error: "Invalid input" };
+  }
+
+  await prisma.apiKey.update({
+    where: {
+      id,
+      userId: session.user.id,
+    },
+    data: {
+      name: validatedData.data.name,
+    },
+  });
+
+  return { success: true };
+};
+
+export const deleteApiKey = async (id: string) => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return { error: "Unauthorized" };
+  }
+
+  await prisma.apiKey.delete({
+    where: {
+      id,
+      userId: session.user.id,
+    },
+  });
+
+  return { success: true };
+};

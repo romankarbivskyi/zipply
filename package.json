@@ -18,6 +18,7 @@
     "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.1",
     "@tabler/icons-react": "^3.37.1",
+    "@tanstack/react-table": "^8.21.3",
     "@tinybirdco/sdk": "^0.0.66",
     "@vercel/functions": "^3.4.3",
     "bcrypt": "^6.0.0",

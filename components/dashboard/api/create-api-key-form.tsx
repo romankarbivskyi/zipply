@@ -17,13 +17,17 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { ApiKeyInput, apiKeySchema } from "@/schemas/apikey";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const CreateApiKeyForm = () => {
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
   const [createdKey, setCreatedKey] = useState("");
+
+  const router = useRouter();
 
   const form = useForm<ApiKeyInput>({
     resolver: zodResolver(apiKeySchema),
@@ -44,6 +48,8 @@ const CreateApiKeyForm = () => {
       form.reset();
       setCreatedKey(res.key);
       setIsOpen(true);
+      toast.success("Created successfully");
+      router.refresh();
     });
   };
 
