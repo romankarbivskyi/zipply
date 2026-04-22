@@ -22,6 +22,16 @@ export const createApiKey = async (data: ApiKeyInput) => {
     return { error: "Invalid input" };
   }
 
+  const existingKeys = await prisma.apiKey.count({
+    where: {
+      userId: session.user.id,
+    },
+  });
+
+  if (existingKeys >= 5) {
+    return { error: "You can only have 5 API keys" };
+  }
+
   const prefix = "zipply_" + createId();
   const secret = createId();
 
