@@ -62,7 +62,7 @@ const CreateApiKeyForm = () => {
         <CardContent>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex items-end gap-4"
+            className="flex flex-col sm:flex-row sm:items-end gap-4"
           >
             <Controller
               name="name"

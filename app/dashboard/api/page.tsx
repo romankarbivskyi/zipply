@@ -7,9 +7,9 @@ export default async function Page() {
   const apiKeys = await getApiKeys();
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex min-w-0 flex-1 flex-col">
       <Heading title="API" />
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-4">
+      <div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-4 p-4">
         <CreateApiKeyForm />
         <ApiKeyList data={apiKeys} />
       </div>

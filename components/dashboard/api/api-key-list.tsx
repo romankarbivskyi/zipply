@@ -53,9 +53,12 @@ interface ApiKeyListProps {
 
 const ApiKeyList = ({ data }: ApiKeyListProps) => {
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
-        <CardTitle>API Keys</CardTitle>
+        <CardTitle>
+          API Keys{" "}
+          <span className="text-muted-foreground">({data.length}/5)</span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <DataTable columns={columns} data={data} />
