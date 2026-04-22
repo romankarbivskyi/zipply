@@ -1,6 +1,6 @@
 "use client";
 
-import { createApiKey } from "@/actions/api";
+import { createApiKey } from "@/actions/api-key";
 import { CopyButton } from "@/components/copy-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -17,7 +17,6 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { ApiKeyInput, apiKeySchema } from "@/schemas/apikey";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Copy } from "lucide-react";
 import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 
