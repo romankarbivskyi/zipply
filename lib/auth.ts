@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./db";
-import { sendVerificationEmail } from "./mailer";
+import { sendVerificationEmail, sendPasswordResetEmail } from "./mailer";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -10,6 +10,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: sendPasswordResetEmail,
   },
   emailVerification: {
     sendOnSignUp: true,

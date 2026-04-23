@@ -1,8 +1,8 @@
 "use client";
 
 import { getAuthSchema } from "@/schemas/auth";
-import { GoogleIcon } from "./icons";
-import { Button } from "./ui/button";
+import { GoogleIcon } from "../icons";
+import { Button } from "../ui/button";
 import {
   Card,
   CardContent,
@@ -10,10 +10,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./ui/card";
-import { Field, FieldError, FieldGroup, FieldLabel } from "./ui/field";
-import { Input } from "./ui/input";
-import { Separator } from "./ui/separator";
+} from "../ui/card";
+import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
+import { Input } from "../ui/input";
+import { Separator } from "../ui/separator";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -22,6 +22,7 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import z from "zod";
+import { ForgotPasswordDialog } from "./forgot-password-dialog";
 
 interface AuthFormProps {
   type: "sign-in" | "sign-up";
@@ -144,7 +145,9 @@ const AuthForm = ({ type }: AuthFormProps) => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                  <div className="flex items-center justify-between">
+                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                  </div>
                   <Input
                     {...field}
                     id={field.name}
@@ -193,14 +196,17 @@ const AuthForm = ({ type }: AuthFormProps) => {
         >
           {isSignIn ? "Sign In" : "Create Account"}
         </Button>
-        <Link
-          href={isSignIn ? "/sign-up" : "/sign-in"}
-          className="text-muted-foreground text-sm hover:underline"
-        >
-          {isSignIn
-            ? "Don't have an account? Sign Up"
-            : "Already have an account? Sign In"}
-        </Link>
+        <div className="flex w-full flex-wrap items-center justify-between gap-2">
+          <Link
+            href={isSignIn ? "/sign-up" : "/sign-in"}
+            className="text-muted-foreground text-sm hover:underline"
+          >
+            {isSignIn
+              ? "Don't have an account? Sign Up"
+              : "Already have an account? Sign In"}
+          </Link>
+          {isSignIn && <ForgotPasswordDialog />}
+        </div>
       </CardFooter>
     </Card>
   );
