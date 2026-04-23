@@ -1,7 +1,12 @@
+import { Metadata } from "next";
 import ApiKeyList from "@/components/dashboard/api/api-key-list";
 import CreateApiKeyForm from "@/components/dashboard/api/create-api-key-form";
 import Heading from "@/components/dashboard/heading";
 import { getApiKeys } from "@/data/api-key";
+
+export const metadata: Metadata = {
+  title: "API Keys",
+};
 
 export default async function Page() {
   const apiKeys = await getApiKeys();

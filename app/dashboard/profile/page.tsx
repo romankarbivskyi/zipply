@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import Heading from "@/components/dashboard/heading";
 
 import { Suspense } from "react";
@@ -5,6 +6,10 @@ import UserInfoCard from "@/components/dashboard/profile/user-info-card";
 import { UserInfoSkeleton } from "@/components/dashboard/profile/profile-skeletons";
 import { DeleteAccountForm } from "@/components/dashboard/profile/delete-account-form";
 import ChangePasswordForm from "@/components/dashboard/profile/change-password-form";
+
+export const metadata: Metadata = {
+  title: "Profile",
+};
 
 export default function Page() {
   return (

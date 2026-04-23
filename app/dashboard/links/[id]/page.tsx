@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import {
   VisitorsChartSkeleton,
   CountriesChartSkeleton,
@@ -17,6 +18,10 @@ import {
 } from "@/data/links";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Analytics",
+};
 
 export default async function Page({
   params,

@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Key, Link as LinkIcon, BarChart2, Trash2, Edit3 } from "lucide-react";
@@ -94,6 +95,14 @@ const EndpointCard = ({
       </CardContent>
     </Card>
   );
+};
+
+export const metadata: Metadata = {
+  title: "API Docs",
+  description: "Zipply API reference and integration guide.",
+  alternates: {
+    canonical: "/docs",
+  },
 };
 
 export default function DocsPage() {

@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { Suspense } from "react";
 import Heading from "@/components/dashboard/heading";
 import LinkList from "@/components/dashboard/links/link-list";
@@ -13,6 +14,10 @@ interface PageProps {
     page?: string;
   }>;
 }
+
+export const metadata: Metadata = {
+  title: "My Links",
+};
 
 export default async function Page({ searchParams }: PageProps) {
   const { search = "", page = "1" } = await searchParams;

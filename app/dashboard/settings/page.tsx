@@ -1,4 +1,9 @@
+import { Metadata } from "next";
 import Heading from "@/components/dashboard/heading";
+
+export const metadata: Metadata = {
+  title: "Settings",
+};
 
 export default function Page() {
   return (

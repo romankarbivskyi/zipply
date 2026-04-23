@@ -11,11 +11,11 @@ const Hero = () => {
       </div>
 
       <h1 className="mb-6 max-w-4xl px-2 text-4xl leading-[1.1] font-extrabold tracking-tighter text-balance sm:mb-8 sm:text-5xl md:text-7xl">
-        Make every link work{" "}
+        Make every <span className="text-primary italic">link</span> work{" "}
         <span className="decoration-primary underline decoration-[4px] underline-offset-4 sm:decoration-[6px] sm:underline-offset-8">
           harder
         </span>{" "}
-        for you.
+        with Zipply.
       </h1>
 
       <p className="text-muted-foreground mb-10 w-full max-w-2xl px-2 text-base leading-relaxed font-medium text-pretty sm:mb-12 sm:text-lg md:text-xl">

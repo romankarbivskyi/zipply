@@ -1,6 +1,9 @@
 export const metadata = {
-  title: "Privacy Policy | Zipply",
+  title: "Privacy Policy",
   description: "Privacy policy for Zipply URL shortener.",
+  alternates: {
+    canonical: "/privacy",
+  },
 };
 
 export default function PrivacyPolicyPage() {
