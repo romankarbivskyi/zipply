@@ -1,4 +1,4 @@
-import { Code2, Home, LinkIcon } from "lucide-react";
+import { BookOpen, Code2, Home, LinkIcon } from "lucide-react";
 
 export const DASHBOARD_NAVIGATION: {
   title: string;
@@ -35,6 +35,11 @@ export const DASHBOARD_NAVIGATION: {
         variant: "default",
       },
     ],
+  },
+  {
+    title: "Docs",
+    href: "/docs",
+    icon: BookOpen,
   },
   // TODO: add settings page later when we have subscriptions
   // {
