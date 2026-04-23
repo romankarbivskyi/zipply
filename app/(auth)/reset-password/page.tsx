@@ -23,16 +23,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { PasswordInput } from "@/components/ui/password-input";
-
-const resetPasswordSchema = z
-  .object({
-    password: z.string().min(8, "Password must be at least 8 characters long"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+import { resetPasswordSchema } from "@/schemas/auth";
 
 export default function ResetPasswordPage() {
   const [isPending, startTransition] = useTransition();
