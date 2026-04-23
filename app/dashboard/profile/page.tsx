@@ -1,15 +1,10 @@
 import Heading from "@/components/dashboard/heading";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from "@/components/ui/card";
+
 import { Suspense } from "react";
 import UserInfoCard from "@/components/dashboard/profile/user-info-card";
 import { UserInfoSkeleton } from "@/components/dashboard/profile/profile-skeletons";
 import { DeleteAccountForm } from "@/components/dashboard/profile/delete-account-form";
+import ChangePasswordForm from "@/components/dashboard/profile/change-password-form";
 
 export default function Page() {
   return (
@@ -20,18 +15,8 @@ export default function Page() {
           <UserInfoCard />
         </Suspense>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Delete Account</CardTitle>
-            <CardDescription>
-              This action cannot be undone. All your data will be permanently
-              deleted.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <DeleteAccountForm />
-          </CardFooter>
-        </Card>
+        <ChangePasswordForm />
+        <DeleteAccountForm />
       </div>
     </div>
   );

@@ -100,7 +100,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
 
         <CardAction className="col-start-1 row-start-auto space-x-2 justify-self-start lg:col-start-2">
           <Dialog>
-            <DialogTrigger>
+            <DialogTrigger asChild>
               <Button variant="outline" size="sm">
                 <QrCode /> QR Code
               </Button>
