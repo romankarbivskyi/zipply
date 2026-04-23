@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { useTransition } from "react";
-import { deleteLinks } from "@/actions/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface SelectionToolbarProps {
@@ -26,6 +26,7 @@ interface SelectionToolbarProps {
 
 const SelectionToolbar = ({ currentLinkIds }: SelectionToolbarProps) => {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const { selectedIds, selectAll, clearSelection } = useSelectionStore();
 
   const selectedCount = currentLinkIds.reduce(
@@ -39,12 +40,19 @@ const SelectionToolbar = ({ currentLinkIds }: SelectionToolbarProps) => {
 
   const handleDeleteSelected = () => {
     startTransition(async () => {
-      const res = await deleteLinks(Array.from(selectedIds));
-      if (res?.error) {
-        toast.error(res.error);
+      const res = await fetch("/api/v1/links", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selectedIds) }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        toast.error(json.error ?? "Failed to delete links");
         return;
       }
       clearSelection();
+      toast.success("Links deleted");
+      router.refresh();
     });
   };
 

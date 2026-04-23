@@ -18,6 +18,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   links         Link[]
+  apiKeys       ApiKey[]
 
   @@unique([email])
   @@map("user")
@@ -84,4 +85,14 @@ model Link {
   clicks Int @default(0)
 
   @@index([shortCode])
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  name      String
+  prefix    String   @unique
+  key       String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }

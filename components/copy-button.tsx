@@ -2,8 +2,15 @@
 
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 import { useState } from "react";
+import { Button, buttonVariants } from "./ui/button";
+import { VariantProps } from "class-variance-authority";
 
-export const CopyButton = ({ text }: { text: string }) => {
+type CopyButtonProps = React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    text: string;
+  };
+
+export const CopyButton = ({ text, ...props }: CopyButtonProps) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -16,16 +23,16 @@ export const CopyButton = ({ text }: { text: string }) => {
   };
 
   return (
-    <button
-      onClick={handleCopy}
-      className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
-      title="Copy short URL"
-    >
+    <Button onClick={handleCopy} {...props} title="Copy short URL">
       {copied ? (
-        <IconCheck className="size-3.5" />
+        <>
+          <IconCheck className="size-3.5" />
+        </>
       ) : (
-        <IconCopy className="size-3.5" />
+        <>
+          <IconCopy className="size-3.5" />
+        </>
       )}
-    </button>
+    </Button>
   );
 };

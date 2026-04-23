@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
-import { createLink, updateLink } from "@/actions/link";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IconLoader2 } from "@tabler/icons-react";
+import { toast } from "sonner";
 import type { Link } from "@/lib/generated/prisma/client";
 
 interface LinkFormProps {
@@ -15,20 +16,42 @@ interface LinkFormProps {
 }
 
 const LinkForm = ({ type = "create", link }: LinkFormProps) => {
-  const [state, action, isPending] = useActionState(
-    async (_prev: { error: string } | null, formData: FormData) => {
-      if (type === "edit" && (!link || !link.id)) {
-        return null;
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const url = formData.get("url") as string;
+    const shortCode = formData.get("shortCode") as string;
+
+    startTransition(async () => {
+      setError(null);
+
+      const res = await fetch(
+        type === "edit" ? `/api/v1/links/${link!.id}` : "/api/v1/links",
+        {
+          method: type === "edit" ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url, shortCode }),
+        },
+      );
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        const msg =
+          typeof json.error === "string" ? json.error : "Something went wrong";
+        setError(msg);
+        return;
       }
 
-      const result =
-        type === "edit"
-          ? await updateLink(link!.id, formData)
-          : await createLink(formData);
-      return result ?? null;
-    },
-    null,
-  );
+      toast.success(type === "edit" ? "Link updated" : "Link created");
+      router.push("/dashboard/links");
+      router.refresh();
+    });
+  };
 
   return (
     <Card className="mx-auto w-full max-w-lg">
@@ -36,7 +59,7 @@ const LinkForm = ({ type = "create", link }: LinkFormProps) => {
         <CardTitle>{type === "create" ? "Create" : "Edit"} Link</CardTitle>
       </CardHeader>
       <CardContent>
-        <form action={action} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <Label htmlFor="url">Destination URL</Label>
             <Input
@@ -69,9 +92,7 @@ const LinkForm = ({ type = "create", link }: LinkFormProps) => {
             </p>
           </div>
 
-          {state?.error && (
-            <p className="text-destructive text-sm">{state.error}</p>
-          )}
+          {error && <p className="text-destructive text-sm">{error}</p>}
 
           <Button type="submit" disabled={isPending} className="w-full">
             {isPending && <IconLoader2 className="size-4 animate-spin" />}
