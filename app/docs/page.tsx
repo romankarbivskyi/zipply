@@ -141,7 +141,7 @@ export default function DocsPage() {
             <p className="text-muted-foreground mt-2">
               Authenticate requests using your API key in the{" "}
               <code className="bg-muted rounded border px-1.5 py-0.5 font-mono text-sm">
-                Authorization
+                x-api-key
               </code>{" "}
               header.
             </p>
@@ -151,14 +151,17 @@ export default function DocsPage() {
             <CardContent className="p-6">
               <div className="space-y-4">
                 <p className="text-muted-foreground text-sm">
-                  All endpoints require a valid API key sent as a Bearer token.
-                  Generate keys securely via your dashboard. Do not expose them
-                  in client-side code.
+                  All endpoints require a valid API key sent in the{" "}
+                  <code className="bg-muted rounded border px-1 text-xs">
+                    x-api-key
+                  </code>{" "}
+                  header. Generate keys securely via your dashboard. Do not
+                  expose them in client-side code.
                 </p>
                 <CodeBlock
                   language="bash"
                   code={`curl -X GET "${baseUrl}/api/v1/links" \\
-  -H "Authorization: Bearer zipply_abc123.def456"`}
+  -H "x-api-key: zipply_abc123.def456"`}
                 />
               </div>
             </CardContent>

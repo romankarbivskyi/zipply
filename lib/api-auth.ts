@@ -24,9 +24,9 @@ const validateApiKey = async (rawKey: string): Promise<ApiSession | null> => {
 export const resolveApiSession = async (
   req: Request,
 ): Promise<ApiSession | null> => {
-  const authHeader = req.headers.get("authorization");
-  if (authHeader?.startsWith("Bearer ")) {
-    return validateApiKey(authHeader.slice(7).trim());
+  const authHeader = req.headers.get("x-api-key");
+  if (authHeader) {
+    return validateApiKey(authHeader.trim());
   }
 
   try {
