@@ -1,5 +1,7 @@
 "use client";
 
+import { useTransition } from "react";
+
 import { getAuthSchema } from "@/schemas/auth";
 import { GoogleIcon } from "../icons";
 import { Button } from "../ui/button";
@@ -18,11 +20,11 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import z from "zod";
 import { ForgotPasswordDialog } from "./forgot-password-dialog";
+import { PasswordInput } from "../ui/password-input";
 
 interface AuthFormProps {
   type: "sign-in" | "sign-up";
@@ -148,10 +150,9 @@ const AuthForm = ({ type }: AuthFormProps) => {
                   <div className="flex items-center justify-between">
                     <FieldLabel htmlFor={field.name}>Password</FieldLabel>
                   </div>
-                  <Input
+                  <PasswordInput
                     {...field}
                     id={field.name}
-                    type="password"
                     aria-invalid={fieldState.invalid}
                     placeholder="Enter your password"
                   />
@@ -170,10 +171,9 @@ const AuthForm = ({ type }: AuthFormProps) => {
                     <FieldLabel htmlFor={field.name}>
                       Confirm Password
                     </FieldLabel>
-                    <Input
+                    <PasswordInput
                       {...field}
                       id={field.name}
-                      type="password"
                       aria-invalid={fieldState.invalid}
                       placeholder="Confirm your password"
                     />

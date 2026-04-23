@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/field";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
+import { PasswordInput } from "@/components/ui/password-input";
 
 const resetPasswordSchema = z
   .object({
@@ -86,10 +87,9 @@ export default function ResetPasswordPage() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="new-password">New Password</FieldLabel>
-                    <Input
+                    <PasswordInput
                       {...field}
                       id="new-password"
-                      type="password"
                       aria-invalid={fieldState.invalid}
                       placeholder="Enter your new password"
                     />
@@ -107,10 +107,9 @@ export default function ResetPasswordPage() {
                     <FieldLabel htmlFor="confirm-password">
                       Confirm Password
                     </FieldLabel>
-                    <Input
+                    <PasswordInput
                       {...field}
                       id="confirm-password"
-                      type="password"
                       aria-invalid={fieldState.invalid}
                       placeholder="Confirm your new password"
                     />
