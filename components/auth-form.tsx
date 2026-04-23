@@ -59,10 +59,13 @@ const AuthForm = ({ type }: AuthFormProps) => {
             email,
             password,
             rememberMe: true,
-            callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
           });
 
           if (error) throw new Error(error.message);
+
+          toast.success("Signed in successfully!");
+          router.push("/dashboard");
+          router.refresh();
         } else {
           const name = email.split("@")[0];
 
@@ -70,12 +73,12 @@ const AuthForm = ({ type }: AuthFormProps) => {
             name,
             email,
             password,
-            callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
           });
 
           if (error) throw new Error(error.message);
 
-          router.push("/dashboard");
+          router.push("/sign-in");
+          toast.success("Account created! Please check your email to verify.");
         }
       } catch (error) {
         toast.error(
