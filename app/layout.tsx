@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="flex min-h-screen antialiased" suppressHydrationWarning>
+      <body className="flex flex-col min-h-screen antialiased bg-background text-foreground" suppressHydrationWarning>
         {children}
         <Toaster />
       </body>
