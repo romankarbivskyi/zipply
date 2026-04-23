@@ -1,7 +1,12 @@
+import { Metadata } from "next";
 import Heading from "@/components/dashboard/heading";
 import LinkForm from "@/components/dashboard/links/link-form";
 import { getLinkById } from "@/data/links";
 import { notFound } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Edit Link",
+};
 
 export default async function Page({ params }: { params: { id: string } }) {
   const linkId = (await params).id;

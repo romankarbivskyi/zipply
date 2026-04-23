@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import CountriesChart from "@/components/dashboard/charts/countries-chart";
 import DateRangeSelect from "@/components/dashboard/date-range-select";
 import DevicesChart from "@/components/dashboard/charts/devices-chart";
@@ -17,6 +18,10 @@ import {
   getDashboardMetrics,
   getDevicesData,
 } from "@/data/links";
+
+export const metadata: Metadata = {
+  title: "Overview",
+};
 
 export default async function Page({
   searchParams,
