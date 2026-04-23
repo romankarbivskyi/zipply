@@ -1,20 +1,13 @@
 import { BookOpen, Code2, Home, LinkIcon } from "lucide-react";
 
-export const DASHBOARD_NAVIGATION: {
+interface NavItem {
   title: string;
   href: string;
   icon: React.ComponentType;
-  tags?: {
-    title: string;
-    variant:
-      | "outline"
-      | "link"
-      | "default"
-      | "secondary"
-      | "destructive"
-      | "ghost";
-  }[];
-}[] = [
+  openInNewTab?: boolean;
+}
+
+export const DASHBOARD_NAVIGATION: NavItem[] = [
   {
     title: "Dashboard",
     href: "/dashboard",
@@ -29,24 +22,13 @@ export const DASHBOARD_NAVIGATION: {
     title: "API",
     href: "/dashboard/api",
     icon: Code2,
-    tags: [
-      {
-        title: "New",
-        variant: "default",
-      },
-    ],
   },
   {
     title: "Docs",
     href: "/docs",
     icon: BookOpen,
+    openInNewTab: true,
   },
-  // TODO: add settings page later when we have subscriptions
-  // {
-  //   title: "Settings",
-  //   href: "/dashboard/settings",
-  //   icon: SlidersHorizontal,
-  // },
 ];
 
 export const LINKS_PER_PAGE = 5;

@@ -15,7 +15,6 @@ import {
 } from "../ui/sidebar";
 import { DASHBOARD_NAVIGATION } from "@/constants";
 import Link from "next/link";
-import { Badge } from "../ui/badge";
 import { LogoIcon } from "../icons";
 import {
   DropdownMenu,
@@ -89,18 +88,12 @@ const AppSidebar = () => {
               {DASHBOARD_NAVIGATION.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <Link href={item.href}>
+                    <Link
+                      href={item.href}
+                      target={item.openInNewTab ? "_blank" : "_self"}
+                    >
                       <item.icon />
                       <span>{item.title}</span>
-                      {item.tags?.length ? (
-                        <div className="ml-auto group-data-[collapsible=icon]:hidden">
-                          {item.tags.map(({ title, variant }) => (
-                            <Badge key={title} variant={variant}>
-                              {title}
-                            </Badge>
-                          ))}
-                        </div>
-                      ) : null}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
