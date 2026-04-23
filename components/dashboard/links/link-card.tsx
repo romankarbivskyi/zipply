@@ -22,7 +22,7 @@ import Image from "next/image";
 import { CopyButton } from "@/components/copy-button";
 import { Button } from "@/components/ui/button";
 import { QrCode, Trash } from "lucide-react";
-import { deleteLinks } from "@/actions/link";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -42,22 +42,25 @@ interface LinkCardProps {
 
 const LinkCard = ({ link }: LinkCardProps) => {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const shortUrl = getShortLink(link.shortCode);
 
   const handleDelete = () => {
     startTransition(async () => {
-      const res = await deleteLinks([link.id]);
-      if (res?.error) {
-        toast.error(res.error);
+      const res = await fetch("/api/v1/links", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: [link.id] }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        toast.error(json.error ?? "Failed to delete link");
         return;
       }
       toast.success("Link deleted successfully");
+      router.refresh();
     });
-  };
-
-  const handleEdit = () => {
-    startTransition(async () => {});
   };
 
   return (
@@ -115,13 +118,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
               </DialogHeader>
             </DialogContent>
           </Dialog>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={isPending}
-            onClick={handleEdit}
-            asChild
-          >
+          <Button variant="outline" size="sm" disabled={isPending} asChild>
             <Link href={`/dashboard/links/edit/${link.id}`}>
               <IconEdit className="size-3.5" />
               Edit
@@ -144,9 +141,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
             <span className="text-primary min-w-0 truncate font-mono text-sm">
               {shortUrl}
             </span>
-            <div className="shrink-0">
-              <CopyButton text={shortUrl} />
-            </div>
+            <CopyButton text={shortUrl} size="xs" variant="ghost" />
           </div>
           <Badge variant="secondary" className="gap-1">
             <IconClick className="size-3.5" />
