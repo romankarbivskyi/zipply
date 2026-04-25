@@ -110,7 +110,6 @@ const LinkItem = ({ link }: LinkItemProps) => {
             size="xs"
             variant="ghost"
             className="size-7 shrink-0 opacity-80 hover:opacity-100"
-            onClick={(e) => e.stopPropagation()}
           />
         </div>
 
