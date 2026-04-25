@@ -44,5 +44,5 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
 };
 
 export const getShortLink = (shortCode: string) => {
-  return `${process.env.NEXT_PUBLIC_BASE_URL || ""}/l/${shortCode}`;
+  return `${process.env.NEXT_PUBLIC_BASE_URL || ""}/${shortCode}`;
 };
