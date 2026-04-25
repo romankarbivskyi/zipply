@@ -98,7 +98,7 @@ export const GET = async (
   const link = await getLinkByShortCode(code);
 
   if (!link) {
-    return new Response("Not Found", { status: 404 });
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   const diagnostic = await getRequestDiagnostics(request);

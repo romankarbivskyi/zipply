@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatNumberWithSuffix, getShortLink } from "@/lib/utils";
 import {
@@ -64,45 +57,93 @@ const LinkCard = ({ link }: LinkCardProps) => {
   };
 
   return (
-    <Card className="from-background to-card/50 bg-linear-to-b">
-      <CardHeader className="grid-cols-1 sm:has-data-[slot=card-action]:grid-cols-[1fr_auto]">
-        <div className="flex items-start gap-4">
-          <div className="bg-muted xs:flex hidden size-12 shrink-0 items-center justify-center rounded-xl">
-            {link.favicon ? (
-              <Image
-                src={link.favicon}
-                alt=""
-                width={28}
-                height={28}
-                className="rounded-sm"
-              />
-            ) : (
-              <IconWorld className="text-muted-foreground size-6" />
-            )}
-          </div>
-          <div className="min-w-0flex-1 max-w-4/5 space-y-1">
-            <CardTitle className="truncate text-lg font-semibold">
-              {link.title}
-            </CardTitle>
-            <CardDescription className="flex min-w-0 items-center gap-1.5">
-              <IconExternalLink className="size-3.5 shrink-0" />
-              <a
+    <Card className="overflow-hidden p-5">
+      <div className="space-y-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-lg">
+              {link.favicon ? (
+                <Image
+                  src={link.favicon}
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="rounded-sm"
+                />
+              ) : (
+                <IconWorld className="text-muted-foreground size-5" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-lg font-semibold wrap-break-word">
+                {link.title}
+              </h2>
+              <Link
                 href={link.originalUrl}
+                className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm break-all transition-colors hover:underline"
                 target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-foreground min-w-0 truncate transition-colors hover:underline"
               >
+                <IconExternalLink className="size-3.5 shrink-0" />
                 {link.originalUrl}
-              </a>
-            </CardDescription>
+              </Link>
+            </div>
+          </div>
+
+          <div className="text-muted-foreground hidden shrink-0 items-end gap-3 text-xs sm:flex">
+            <Badge className="flex items-center gap-1">
+              <IconClick className="size-3.5" />
+              {formatNumberWithSuffix(link.clicks)} clicks
+            </Badge>
+            <Badge variant="ghost" className="flex items-center gap-1">
+              <IconCalendar className="size-3.5" />
+              {formatDate(link.createdAt)}
+            </Badge>
           </div>
         </div>
 
-        <CardAction className="col-start-1 row-start-auto space-x-2 justify-self-start lg:col-start-2">
+        <div className="bg-muted/50 flex items-center justify-between gap-2 rounded-lg border px-4 py-3">
+          <span className="text-primary min-w-0 font-mono text-sm font-medium break-all">
+            {shortUrl}
+          </span>
+          <CopyButton text={shortUrl} size="sm" variant="outline" />
+        </div>
+
+        <div className="text-muted-foreground flex items-center gap-3 text-xs sm:hidden">
+          <Badge className="flex items-center gap-1">
+            <IconClick className="size-3.5" />
+            {formatNumberWithSuffix(link.clicks)} clicks
+          </Badge>
+          <Badge variant="ghost" className="flex items-center gap-1">
+            <IconCalendar className="size-3.5" />
+            {formatDate(link.createdAt)}
+          </Badge>
+        </div>
+
+        {link.tags && link.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {link.tags.map((tag) => (
+              <Badge key={tag} variant="outline">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        <hr className="border-border" />
+
+        <div className="flex items-center justify-end gap-2">
+          <Button variant="outline" size="sm" disabled={isPending} asChild>
+            <Link href={`/dashboard/links/edit/${link.id}`}>
+              <IconEdit className="size-3.5" />
+              Edit
+            </Link>
+          </Button>
+
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
-                <QrCode /> QR Code
+                <QrCode className="size-3.5" />
+                QR
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -118,12 +159,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
               </DialogHeader>
             </DialogContent>
           </Dialog>
-          <Button variant="outline" size="sm" disabled={isPending} asChild>
-            <Link href={`/dashboard/links/edit/${link.id}`}>
-              <IconEdit className="size-3.5" />
-              Edit
-            </Link>
-          </Button>
+
           <Button
             variant="destructive"
             size="sm"
@@ -133,26 +169,8 @@ const LinkCard = ({ link }: LinkCardProps) => {
             <Trash className="size-3.5" />
             Delete
           </Button>
-        </CardAction>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex min-w-0 items-center gap-1.5">
-            <span className="text-primary min-w-0 truncate font-mono text-sm">
-              {shortUrl}
-            </span>
-            <CopyButton text={shortUrl} size="xs" variant="ghost" />
-          </div>
-          <Badge variant="secondary" className="gap-1">
-            <IconClick className="size-3.5" />
-            {formatNumberWithSuffix(link.clicks)} clicks
-          </Badge>
-          <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
-            <IconCalendar className="size-3.5" />
-            {formatDate(link.createdAt)}
-          </div>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 };

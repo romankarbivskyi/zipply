@@ -21,6 +21,7 @@ export const GET = async (req: Request) => {
           OR: [
             { originalUrl: { contains: search, mode: "insensitive" as const } },
             { shortCode: { contains: search, mode: "insensitive" as const } },
+            { tags: { hasSome: [search] } },
           ],
         }
       : {}),
@@ -65,7 +66,7 @@ export const POST = async (req: Request) => {
     );
   }
 
-  const { url, shortCode } = parsed.data;
+  const { url, shortCode, tags } = parsed.data;
   const code = shortCode || nanoid(7);
 
   const existing = await prisma.link.findFirst({ where: { shortCode: code } });
@@ -82,6 +83,7 @@ export const POST = async (req: Request) => {
       userId: session.userId,
       title,
       favicon,
+      tags,
     },
   });
 

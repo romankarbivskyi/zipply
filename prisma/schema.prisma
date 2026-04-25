@@ -82,7 +82,8 @@ model Link {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
 
-  clicks Int @default(0)
+  tags   String[] @default([])
+  clicks Int      @default(0)
 
   @@index([shortCode])
 }

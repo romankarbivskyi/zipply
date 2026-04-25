@@ -48,7 +48,7 @@ export const PATCH = async (req: Request, { params }: RouteContext) => {
     );
   }
 
-  const { url, shortCode } = parsed.data;
+  const { url, shortCode, tags } = parsed.data;
   const code = shortCode || nanoid(7);
 
   const existing = await prisma.link.findUnique({
@@ -67,7 +67,7 @@ export const PATCH = async (req: Request, { params }: RouteContext) => {
 
   const link = await prisma.link.update({
     where: { id },
-    data: { originalUrl: url, shortCode: code, title, favicon },
+    data: { originalUrl: url, shortCode: code, title, favicon, tags },
   });
 
   return Response.json({ data: link });
