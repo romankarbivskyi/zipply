@@ -128,9 +128,9 @@ const LinkItem = ({ link }: LinkItemProps) => {
 
           {link.tags && link.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {link.tags.map((tag) => (
+              {link.tags.map((tag, index) => (
                 <Badge
-                  key={tag}
+                  key={index}
                   variant="outline"
                   className="bg-background/50 max-w-[100px] truncate px-1.5 py-0 text-[10px] font-medium"
                 >
