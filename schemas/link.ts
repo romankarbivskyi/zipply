@@ -12,6 +12,29 @@ export const createLinkSchema = z.object({
     )
     .optional()
     .or(z.literal("")),
+  tags: z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .default("")
+    .transform((val) => {
+      if (Array.isArray(val)) return val;
+      return val
+        ? val
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [];
+    })
+    .refine(
+      (tags) => tags.every((t) => t.length > 0 && t.length <= 20),
+      "Each tag must be between 1 and 20 characters",
+    )
+    .refine(
+      (tags) => new Set(tags).size === tags.length,
+      "Duplicate tags are not allowed",
+    )
+    .refine((tags) => tags.length <= 10, "You can add up to 10 tags"),
 });
 
 export type CreateLinkSchema = z.infer<typeof createLinkSchema>;
+export type CreateLinkInput = z.input<typeof createLinkSchema>;
