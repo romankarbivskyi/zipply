@@ -37,7 +37,8 @@ export const clicksOverTime = defineEndpoint("clicks_over_time", {
   description: "Get clicks and unique visitors over time",
   params: {
     user_id: p.string().describe("User ID"),
-    period: p.string().optional("30d").describe("Period: 7d, 30d, or 90d"),
+    from_date: p.string().describe("Start date (ISO 8601)"),
+    to_date: p.string().describe("End date (ISO 8601)"),
     link_id: p.string().optional("").describe("Optional specific link ID"),
   },
   nodes: [
@@ -50,12 +51,8 @@ export const clicksOverTime = defineEndpoint("clicks_over_time", {
           uniqExact(ip_hash) as unique_visitors
         FROM click_events
         WHERE user_id = {{String(user_id)}}
-          AND ts >= now() - INTERVAL
-            multiIf(
-              {{String(period)}} = '7d', 7,
-              {{String(period)}} = '30d', 30,
-              90
-            ) DAY
+          AND ts >= fromISO8601({{String(from_date)}})
+          AND ts <= fromISO8601({{String(to_date)}})
           AND (
             {{String(link_id, '')}} = ''
             OR link_id = {{String(link_id, '')}}
@@ -79,7 +76,8 @@ export const countriesData = defineEndpoint("countries_data", {
   description: "Get click breakdown by country",
   params: {
     user_id: p.string().describe("User ID"),
-    period: p.string().optional("30d").describe("Period: 7d, 30d, or 90d"),
+    from_date: p.string().describe("Start date (ISO 8601)"),
+    to_date: p.string().describe("End date (ISO 8601)"),
     link_id: p.string().optional("").describe("Optional specific link ID"),
   },
   nodes: [
@@ -91,12 +89,8 @@ export const countriesData = defineEndpoint("countries_data", {
           count() as visitors
         FROM click_events
         WHERE user_id = {{String(user_id)}}
-          AND ts >= now() - INTERVAL
-            multiIf(
-              {{String(period)}} = '7d', 7,
-              {{String(period)}} = '30d', 30,
-              90
-            ) DAY
+          AND ts >= fromISO8601({{String(from_date)}})
+          AND ts <= fromISO8601({{String(to_date)}})
           AND country != 'Unknown'
           AND (
             {{String(link_id, '')}} = ''
@@ -121,7 +115,8 @@ export const devicesData = defineEndpoint("devices_data", {
   description: "Get click breakdown by device type",
   params: {
     user_id: p.string().describe("User ID"),
-    period: p.string().optional("30d").describe("Period: 7d, 30d, or 90d"),
+    from_date: p.string().describe("Start date (ISO 8601)"),
+    to_date: p.string().describe("End date (ISO 8601)"),
     link_id: p.string().optional("").describe("Optional specific link ID"),
   },
   nodes: [
@@ -133,12 +128,8 @@ export const devicesData = defineEndpoint("devices_data", {
           count() as visitors
         FROM click_events
         WHERE user_id = {{String(user_id)}}
-          AND ts >= now() - INTERVAL
-            multiIf(
-              {{String(period)}} = '7d', 7,
-              {{String(period)}} = '30d', 30,
-              90
-            ) DAY
+          AND ts >= fromISO8601({{String(from_date)}})
+          AND ts <= fromISO8601({{String(to_date)}})
           AND (
             {{String(link_id, '')}} = ''
             OR link_id = {{String(link_id, '')}}
@@ -161,7 +152,8 @@ export const dashboardMetrics = defineEndpoint("dashboard_metrics", {
   description: "Get total clicks and unique visitors for dashboard",
   params: {
     user_id: p.string().describe("User ID"),
-    period: p.string().optional("30d").describe("Period: 7d, 30d, or 90d"),
+    from_date: p.string().describe("Start date (ISO 8601)"),
+    to_date: p.string().describe("End date (ISO 8601)"),
   },
   nodes: [
     node({
@@ -172,12 +164,8 @@ export const dashboardMetrics = defineEndpoint("dashboard_metrics", {
           uniqExact(ip_hash) as unique_visitors
         FROM click_events
         WHERE user_id = {{String(user_id)}}
-          AND ts >= now() - INTERVAL
-            multiIf(
-              {{String(period)}} = '7d', 7,
-              {{String(period)}} = '30d', 30,
-              90
-            ) DAY
+          AND ts >= fromISO8601({{String(from_date)}})
+          AND ts <= fromISO8601({{String(to_date)}})
       `,
     }),
   ],

@@ -5,13 +5,17 @@ import {
   type CountriesDataOutput,
   type DevicesDataOutput,
 } from "@/lib/tinybird";
-import { resolveApiSession, unauthorized, badRequest, notFound } from "@/lib/api-auth";
+import {
+  resolveApiSession,
+  unauthorized,
+  badRequest,
+  notFound,
+} from "@/lib/api-auth";
+import { fillMissingDates, dateToISO8601 } from "@/lib/date-utils";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
-
-const VALID_PERIODS = ["7d", "30d", "90d"];
 
 export const GET = async (req: Request, { params }: RouteContext) => {
   const session = await resolveApiSession(req);
@@ -19,27 +23,43 @@ export const GET = async (req: Request, { params }: RouteContext) => {
 
   const { id } = await params;
 
-  const link = await prisma.link.findUnique({ where: { id, userId: session.userId } });
+  const link = await prisma.link.findUnique({
+    where: { id, userId: session.userId },
+  });
   if (!link) return notFound();
 
   const { searchParams } = new URL(req.url);
-  const period = searchParams.get("period") ?? "30d";
-  if (!VALID_PERIODS.includes(period)) {
-    return badRequest(`period must be one of: ${VALID_PERIODS.join(", ")}`);
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
+
+  if (!from || !to) {
+    return badRequest(
+      "from and to date parameters are required (yyyy-MM-dd format)",
+    );
   }
 
-  const queryParams = { user_id: session.userId, period, link_id: id };
+  const queryParams = {
+    user_id: session.userId,
+    from_date: dateToISO8601(from),
+    to_date: dateToISO8601(to),
+    link_id: id,
+  };
 
   const [clicksOverTime, countriesData, devicesData] = await Promise.all([
     tinybird.clicksOverTime
       .query(queryParams)
-      .then((res) =>
-        res.data.map((row: ClicksOverTimeOutput) => ({
+      .then((res) => {
+        const data = res.data.map((row: ClicksOverTimeOutput) => ({
           date: row.date,
           clicks: Number(row.clicks),
           uniqueVisitors: Number(row.unique_visitors),
-        })),
-      )
+        }));
+        return fillMissingDates(data, from, to) as Array<{
+          date: string;
+          clicks: number;
+          uniqueVisitors: number;
+        }>;
+      })
       .catch(() => []),
 
     tinybird.countriesData
@@ -63,5 +83,7 @@ export const GET = async (req: Request, { params }: RouteContext) => {
       .catch(() => []),
   ]);
 
-  return Response.json({ data: { link, period, clicksOverTime, countriesData, devicesData } });
+  return Response.json({
+    data: { link, from, to, clicksOverTime, countriesData, devicesData },
+  });
 };

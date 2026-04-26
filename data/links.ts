@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Link } from "@/lib/generated/prisma/client";
 import { LINKS_PER_PAGE } from "@/constants";
+import { fillMissingDates, dateToISO8601 } from "@/lib/date-utils";
 import {
   tinybird,
   type ClicksOverTimeOutput,
@@ -113,12 +114,18 @@ export const getLinkById = async (id: string): Promise<Link | null> => {
   return link;
 };
 
-export const getClicksOverTime = async (period: string, linkId?: string) => {
+export const getClicksOverTime = async (
+  linkId?: string,
+  fromDate?: string,
+  toDate?: string,
+) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session) return [];
+
+  if (!fromDate || !toDate) return [];
 
   if (linkId) {
     const link = await prisma.link.findFirst({
@@ -131,27 +138,44 @@ export const getClicksOverTime = async (period: string, linkId?: string) => {
   try {
     const data = await tinybird.clicksOverTime.query({
       user_id: session.user.id,
-      period,
+      from_date: dateToISO8601(fromDate),
+      to_date: dateToISO8601(toDate),
       link_id: linkId || "",
     });
 
-    return data.data.map((row: ClicksOverTimeOutput) => ({
+    const mapped: Array<{
+      date: string;
+      clicks: number;
+      uniqueVisitors: number;
+    }> = data.data.map((row: ClicksOverTimeOutput) => ({
       date: row.date,
       clicks: Number(row.clicks),
       uniqueVisitors: Number(row.unique_visitors),
     }));
+
+    return fillMissingDates(mapped, fromDate, toDate) as Array<{
+      date: string;
+      clicks: number;
+      uniqueVisitors: number;
+    }>;
   } catch (error) {
     console.error("Failed to fetch clicks over time", { error, linkId });
     return [];
   }
 };
 
-export const getCountriesData = async (period: string, linkId?: string) => {
+export const getCountriesData = async (
+  linkId?: string,
+  fromDate?: string,
+  toDate?: string,
+) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session) return [];
+
+  if (!fromDate || !toDate) return [];
 
   if (linkId) {
     const link = await prisma.link.findFirst({
@@ -164,7 +188,8 @@ export const getCountriesData = async (period: string, linkId?: string) => {
   try {
     const data = await tinybird.countriesData.query({
       user_id: session.user.id,
-      period,
+      from_date: dateToISO8601(fromDate),
+      to_date: dateToISO8601(toDate),
       link_id: linkId || "",
     });
 
@@ -178,12 +203,18 @@ export const getCountriesData = async (period: string, linkId?: string) => {
   }
 };
 
-export const getDevicesData = async (period: string, linkId?: string) => {
+export const getDevicesData = async (
+  linkId?: string,
+  fromDate?: string,
+  toDate?: string,
+) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session) return [];
+
+  if (!fromDate || !toDate) return [];
 
   if (linkId) {
     const link = await prisma.link.findFirst({
@@ -196,7 +227,8 @@ export const getDevicesData = async (period: string, linkId?: string) => {
   try {
     const data = await tinybird.devicesData.query({
       user_id: session.user.id,
-      period,
+      from_date: dateToISO8601(fromDate),
+      to_date: dateToISO8601(toDate),
       link_id: linkId || "",
     });
 
@@ -221,13 +253,17 @@ export const getDevicesData = async (period: string, linkId?: string) => {
 };
 
 export const getDashboardMetrics = async (
-  period: string,
+  fromDate?: string,
+  toDate?: string,
 ): Promise<DashboardMetrics> => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session) return { totalLinks: 0, totalClicks: 0, uniqueVisitors: 0 };
+
+  if (!fromDate || !toDate)
+    return { totalLinks: 0, totalClicks: 0, uniqueVisitors: 0 };
 
   try {
     const [linksCount, metricsData] = await Promise.all([
@@ -238,7 +274,8 @@ export const getDashboardMetrics = async (
       }),
       tinybird.dashboardMetrics.query({
         user_id: session.user.id,
-        period,
+        from_date: dateToISO8601(fromDate),
+        to_date: dateToISO8601(toDate),
       }),
     ]);
 

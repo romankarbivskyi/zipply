@@ -7,7 +7,7 @@ import {
 import CountriesChart from "@/components/dashboard/charts/countries-chart";
 import DevicesChart from "@/components/dashboard/charts/devices-chart";
 import VisitorsChart from "@/components/dashboard/charts/visitors-chart";
-import DateRangeSelect from "@/components/dashboard/date-range-select";
+import CalendarRange from "@/components/dashboard/calendar-range";
 import Heading from "@/components/dashboard/heading";
 import LinkCard from "@/components/dashboard/links/link-card";
 import {
@@ -31,7 +31,13 @@ export default async function Page({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const linkId = (await params).id;
-  const timeRange = ((await searchParams).timeRange as string) || "30d";
+  const paramsData = await searchParams;
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const from =
+    (paramsData.from as string) || thirtyDaysAgo.toISOString().split("T")[0];
+  const to = (paramsData.to as string) || today.toISOString().split("T")[0];
 
   const link = await getLinkById(linkId);
 
@@ -39,16 +45,18 @@ export default async function Page({
     notFound();
   }
 
-  const clicksData = getClicksOverTime(timeRange, linkId);
-  const countriesData = getCountriesData(timeRange, linkId);
-  const devicesData = getDevicesData(timeRange, linkId);
+  const clicksData = getClicksOverTime(linkId, from, to);
+  const countriesData = getCountriesData(linkId, from, to);
+  const devicesData = getDevicesData(linkId, from, to);
 
   return (
     <div className="flex flex-1 flex-col">
       <Heading title="Link Details" />
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-4">
         <LinkCard link={link} />
-        <DateRangeSelect />
+        <div className="self-left">
+          <CalendarRange />
+        </div>
         <Suspense fallback={<VisitorsChartSkeleton />}>
           <VisitorsChart data={clicksData} />
         </Suspense>
