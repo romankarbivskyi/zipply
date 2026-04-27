@@ -54,16 +54,3 @@ export const formatDateRange = (fromDate: string, toDate: string): string => {
     return "the selected period";
   }
 };
-
-export const dateToISO8601 = (dateStr: string): string => {
-  try {
-    if (dateStr.includes("T")) {
-      return dateStr;
-    }
-    const date = parseISO(dateStr);
-    return date.toISOString();
-  } catch (error) {
-    console.error("Error converting date to ISO 8601:", error);
-    return dateStr;
-  }
-};

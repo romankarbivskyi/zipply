@@ -3,13 +3,15 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Link } from "@/lib/generated/prisma/client";
 import { LINKS_PER_PAGE } from "@/constants";
-import { fillMissingDates, dateToISO8601 } from "@/lib/date-utils";
+import { fillMissingDates } from "@/lib/date-utils";
 import {
   tinybird,
   type ClicksOverTimeOutput,
   type CountriesDataOutput,
   type DevicesDataOutput,
   type DashboardMetricsOutput,
+  type AvailableCountriesOutput,
+  type AvailableDevicesOutput,
 } from "@/lib/tinybird";
 
 export interface DashboardMetrics {
@@ -118,6 +120,8 @@ export const getClicksOverTime = async (
   linkId?: string,
   fromDate?: string,
   toDate?: string,
+  country?: string,
+  device?: string,
 ) => {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -138,9 +142,11 @@ export const getClicksOverTime = async (
   try {
     const data = await tinybird.clicksOverTime.query({
       user_id: session.user.id,
-      from_date: dateToISO8601(fromDate),
-      to_date: dateToISO8601(toDate),
+      from_date: fromDate,
+      to_date: toDate,
       link_id: linkId || "",
+      country: country || "",
+      device: device || "",
     });
 
     const mapped: Array<{
@@ -168,7 +174,9 @@ export const getCountriesData = async (
   linkId?: string,
   fromDate?: string,
   toDate?: string,
-) => {
+  country?: string,
+  device?: string,
+): Promise<CountriesDataOutput[]> => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -188,9 +196,11 @@ export const getCountriesData = async (
   try {
     const data = await tinybird.countriesData.query({
       user_id: session.user.id,
-      from_date: dateToISO8601(fromDate),
-      to_date: dateToISO8601(toDate),
+      from_date: fromDate,
+      to_date: toDate,
       link_id: linkId || "",
+      country: country || "",
+      device: device || "",
     });
 
     return data.data.map((row: CountriesDataOutput) => ({
@@ -207,6 +217,8 @@ export const getDevicesData = async (
   linkId?: string,
   fromDate?: string,
   toDate?: string,
+  country?: string,
+  device?: string,
 ) => {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -227,23 +239,26 @@ export const getDevicesData = async (
   try {
     const data = await tinybird.devicesData.query({
       user_id: session.user.id,
-      from_date: dateToISO8601(fromDate),
-      to_date: dateToISO8601(toDate),
+      from_date: fromDate,
+      to_date: toDate,
       link_id: linkId || "",
+      country: country || "",
+      device: device || "",
     });
 
     const colorMap: Record<string, string> = {
       desktop: "var(--color-desktop)",
       mobile: "var(--color-mobile)",
       tablet: "var(--color-tablet)",
+      unknown: "var(--color-unknown)",
     };
 
     return data.data.map((row: DevicesDataOutput) => {
-      const device = (row.device || "other").toLowerCase();
+      const dev = (row.device || "other").toLowerCase();
       return {
-        device,
+        device: dev,
         visitors: Number(row.visitors),
-        fill: colorMap[device] || "var(--color-other)",
+        fill: colorMap[dev] || "var(--color-other)",
       };
     });
   } catch (error) {
@@ -255,6 +270,8 @@ export const getDevicesData = async (
 export const getDashboardMetrics = async (
   fromDate?: string,
   toDate?: string,
+  country?: string,
+  device?: string,
 ): Promise<DashboardMetrics> => {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -274,8 +291,10 @@ export const getDashboardMetrics = async (
       }),
       tinybird.dashboardMetrics.query({
         user_id: session.user.id,
-        from_date: dateToISO8601(fromDate),
-        to_date: dateToISO8601(toDate),
+        from_date: fromDate,
+        to_date: toDate,
+        country: country || "",
+        device: device || "",
       }),
     ]);
 
@@ -289,5 +308,77 @@ export const getDashboardMetrics = async (
   } catch (error) {
     console.error("Failed to fetch dashboard metrics", { error });
     return { totalLinks: 0, totalClicks: 0, uniqueVisitors: 0 };
+  }
+};
+
+export const getAvailableCountries = async (
+  linkId?: string,
+  fromDate?: string,
+  toDate?: string,
+): Promise<AvailableCountriesOutput[]> => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) return [];
+
+  if (!fromDate || !toDate) return [];
+
+  if (linkId) {
+    const link = await prisma.link.findFirst({
+      where: { id: linkId, userId: session.user.id },
+      select: { id: true },
+    });
+    if (!link) return [];
+  }
+
+  try {
+    const data = await tinybird.availableCountries.query({
+      user_id: session.user.id,
+      from_date: fromDate,
+      to_date: toDate,
+      link_id: linkId || "",
+    });
+
+    return data.data;
+  } catch (error) {
+    console.error("Failed to fetch available countries", { error, linkId });
+    return [];
+  }
+};
+
+export const getAvailableDevices = async (
+  linkId?: string,
+  fromDate?: string,
+  toDate?: string,
+): Promise<AvailableDevicesOutput[]> => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) return [];
+
+  if (!fromDate || !toDate) return [];
+
+  if (linkId) {
+    const link = await prisma.link.findFirst({
+      where: { id: linkId, userId: session.user.id },
+      select: { id: true },
+    });
+    if (!link) return [];
+  }
+
+  try {
+    const data = await tinybird.availableDevices.query({
+      user_id: session.user.id,
+      from_date: fromDate,
+      to_date: toDate,
+      link_id: linkId || "",
+    });
+
+    return data.data;
+  } catch (error) {
+    console.error("Failed to fetch available devices", { error, linkId });
+    return [];
   }
 };
