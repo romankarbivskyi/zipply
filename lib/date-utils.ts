@@ -54,3 +54,11 @@ export const formatDateRange = (fromDate: string, toDate: string): string => {
     return "the selected period";
   }
 };
+
+export const dateToISO8601 = (dateStr: string): string => {
+  try {
+    return parseISO(dateStr).toISOString();
+  } catch {
+    return new Date(dateStr).toISOString();
+  }
+};
