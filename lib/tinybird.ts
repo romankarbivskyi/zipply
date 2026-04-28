@@ -28,6 +28,7 @@ export const clicks = defineDatasource("click_events", {
   engine: engine.mergeTree({
     sortingKey: ["event_id", "user_id", "link_id", "ts"],
     primaryKey: ["event_id"],
+    ttl: "ts + INTERVAL 1 YEAR",
   }),
 });
 
