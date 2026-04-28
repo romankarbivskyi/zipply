@@ -27,8 +27,8 @@ const chartConfig = {
     label: "Tablet",
     color: "var(--chart-3)",
   },
-  other: {
-    label: "Other",
+  unknown: {
+    label: "Unknown",
     color: "var(--chart-4)",
   },
 } satisfies ChartConfig;

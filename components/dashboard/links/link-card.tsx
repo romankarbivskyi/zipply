@@ -121,8 +121,8 @@ const LinkCard = ({ link }: LinkCardProps) => {
 
         {link.tags && link.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            {link.tags.map((tag) => (
-              <Badge key={tag} variant="outline">
+            {link.tags.map((tag, index) => (
+              <Badge key={index} variant="outline">
                 {tag}
               </Badge>
             ))}

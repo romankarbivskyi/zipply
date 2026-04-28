@@ -46,3 +46,6 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
 export const getShortLink = (shortCode: string) => {
   return `${process.env.NEXT_PUBLIC_BASE_URL || ""}/${shortCode}`;
 };
+
+export const getParam = (value: string | string[] | undefined) =>
+  Array.isArray(value) ? (value[0] ?? "") : (value ?? "");

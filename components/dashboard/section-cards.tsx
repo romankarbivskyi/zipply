@@ -9,20 +9,16 @@ import {
 import { IconLink, IconClick, IconUsers } from "@tabler/icons-react";
 import { formatNumberWithSuffix } from "@/lib/utils";
 import { DashboardMetrics } from "@/data/links";
+import { formatDateRange } from "@/lib/date-utils";
 
 interface SectionCardsProps {
   data: Promise<DashboardMetrics>;
-  timeRange: string;
+  from: string;
+  to: string;
 }
 
-const timeRangeMap: Record<string, string> = {
-  "7d": "7 days",
-  "30d": "30 days",
-  "90d": "90 days",
-};
-
-const SectionCards = ({ data, timeRange }: SectionCardsProps) => {
-  const periodLabel = timeRangeMap[timeRange] || "the selected period";
+const SectionCards = ({ data, from, to }: SectionCardsProps) => {
+  const periodLabel = formatDateRange(from, to);
   const metrics = use(data);
 
   return (

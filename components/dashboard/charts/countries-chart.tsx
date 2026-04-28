@@ -9,6 +9,9 @@ import {
   ChartConfig,
 } from "../../ui/chart";
 
+import { use, useState } from "react";
+import { Button } from "@/components/ui/button";
+
 const chartConfig = {
   visitors: {
     label: "Visitors",
@@ -16,37 +19,53 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-import { use } from "react";
-
 interface ChartData {
   country: string;
   visitors: number;
 }
 
 interface CountriesChartProps {
-  data: Promise<ChartData[]>;
+  countries: Promise<ChartData[]>;
 }
 
-const CountriesChart = ({ data }: CountriesChartProps) => {
-  const chartData = use(data);
+const CountriesChart = ({ countries }: CountriesChartProps) => {
+  const chartData = use(countries);
+  const [showAll, setShowAll] = useState(false);
+  const displayData = showAll ? chartData : chartData.slice(0, 6);
 
   return (
     <Card className="flex flex-col">
       <CardHeader>
-        <CardTitle>Top Countries</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>Countries</CardTitle>
+          {chartData.length > 6 && (
+            <Button
+              onClick={() => setShowAll(!showAll)}
+              variant="outline"
+              size="sm"
+            >
+              {showAll ? "Show Less" : "View All"}
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="flex-1">
-        {!chartData.length ? (
+        {!displayData.length ? (
           <div className="flex h-[250px] flex-col items-center justify-center gap-2">
             <p className="text-muted-foreground text-sm">No data available</p>
           </div>
         ) : (
           <ChartContainer
             config={chartConfig}
-            className="aspect-auto h-[250px] w-full"
+            className={`aspect-auto w-full ${showAll ? "h-auto" : "h-[250px]"}`}
+            style={{
+              height: showAll
+                ? `${Math.max(300, displayData.length * 40)}px`
+                : "250px",
+            }}
           >
             <BarChart
-              data={chartData}
+              data={displayData}
               layout="vertical"
               margin={{ left: 0, right: 16 }}
             >
