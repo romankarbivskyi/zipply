@@ -11,7 +11,7 @@ export const deleteAccount = async () => {
   });
 
   if (!session?.user?.id) {
-    redirect("/login");
+    return redirect("/login");
   }
 
   await prisma.user.delete({
@@ -20,5 +20,5 @@ export const deleteAccount = async () => {
     },
   });
 
-  redirect("/");
+  return redirect("/");
 };

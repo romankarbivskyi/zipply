@@ -44,6 +44,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
     defaultValues: {
       email: "",
       password: "",
+      ...(type === "sign-up" ? { confirmPassword: "" } : {}),
     },
   });
 
