@@ -15,11 +15,7 @@ describe("SectionCards", () => {
     await act(async () => {
       render(
         <Suspense fallback={<div>Loading...</div>}>
-          <SectionCards
-            data={mockData}
-            from="2023-01-01"
-            to="2023-01-31"
-          />
+          <SectionCards data={mockData} from="2023-01-01" to="2023-01-31" />
         </Suspense>,
       );
     });

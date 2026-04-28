@@ -13,7 +13,13 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@/components/ui/select", () => ({
-  Select: ({ children, onValueChange }: { children: React.ReactNode; onValueChange: (value: string) => void }) => (
+  Select: ({
+    children,
+    onValueChange,
+  }: {
+    children: React.ReactNode;
+    onValueChange: (value: string) => void;
+  }) => (
     <div data-testid="select">
       {children}
       <button
@@ -26,13 +32,25 @@ vi.mock("@/components/ui/select", () => ({
       ></button>
     </div>
   ),
-  SelectContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  SelectGroup: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  SelectItem: ({ children, value }: { children: React.ReactNode; value: string }) => (
-    <div data-testid={`item-${value}`}>{children}</div>
+  SelectContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
   ),
-  SelectTrigger: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  SelectValue: ({ placeholder }: { placeholder: string }) => <div>{placeholder}</div>,
+  SelectGroup: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  SelectItem: ({
+    children,
+    value,
+  }: {
+    children: React.ReactNode;
+    value: string;
+  }) => <div data-testid={`item-${value}`}>{children}</div>,
+  SelectTrigger: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  SelectValue: ({ placeholder }: { placeholder: string }) => (
+    <div>{placeholder}</div>
+  ),
 }));
 
 describe("DeviceSelect", () => {
