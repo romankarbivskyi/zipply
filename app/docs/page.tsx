@@ -1,3 +1,4 @@
+import React from "react";
 import { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +36,7 @@ const EndpointCard = ({
   path: string;
   title: string;
   description: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   requestBody?: string;
   responseBody: string;
 }) => {

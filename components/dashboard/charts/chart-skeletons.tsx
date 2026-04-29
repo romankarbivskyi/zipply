@@ -15,7 +15,7 @@ export const VisitorsChartSkeleton = () => {
                 key={i}
                 className="flex-1 rounded-sm"
                 style={{
-                  height: `${Math.random() * 60 + 20}%`,
+                  height: `${((i * 17 + 7) % 60) + 20}%`,
                   animationDelay: `${i * 50}ms`,
                 }}
               />

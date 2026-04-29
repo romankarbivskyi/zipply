@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ApiKeyInput, apiKeySchema } from "@/schemas/apikey";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
@@ -39,6 +39,8 @@ const RenameApiKeyDialog = ({ id, name }: RenameApiKeyDialogProps) => {
       name,
     },
   });
+
+  const watchedName = useWatch({ control: form.control, name: "name" });
 
   const onSubmit = (data: ApiKeyInput) => {
     startTransition(async () => {
@@ -108,7 +110,7 @@ const RenameApiKeyDialog = ({ id, name }: RenameApiKeyDialogProps) => {
             type="submit"
             variant="outline"
             form="rename-api-key-form"
-            disabled={isPending || name == form.watch("name")}
+            disabled={isPending || name === watchedName}
           >
             Rename
           </Button>

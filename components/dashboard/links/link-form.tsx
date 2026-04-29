@@ -71,7 +71,7 @@ const LinkForm = ({ type = "create", link }: LinkFormProps) => {
         <CardTitle>{type === "create" ? "Create" : "Edit"} Link</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={form.handleSubmit(onSubmit as any)}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
               name="url"
