@@ -1,4 +1,3 @@
-import { LinkIcon, Zap, Shield } from "lucide-react";
 import Hero from "@/components/sections/hero";
 import Features from "@/components/sections/features";
 import FAQ from "@/components/sections/faq";

@@ -5,8 +5,6 @@ import { DataTable } from "../data-table";
 import { ApiKey } from "@/lib/generated/prisma/client";
 import { formatDate } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
 import RenameApiKeyDialog from "./rename-api-key-dialog";
 import DeleteApiKeyDialog from "./delete-api-key-dialog";
 

@@ -4,7 +4,6 @@ import {
   screen,
   fireEvent,
   waitFor,
-  act,
 } from "@testing-library/react";
 import { ForgotPasswordDialog } from "@/components/auth/forgot-password-dialog";
 
