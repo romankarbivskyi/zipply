@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { Link } from "@/lib/generated/prisma/client";
 import { LINKS_PER_PAGE } from "@/constants";
 import { fillMissingDates } from "@/lib/date-utils";
+import { logger } from "@/lib/logger";
 import {
   tinybird,
   type ClicksOverTimeOutput,
@@ -165,7 +166,7 @@ export const getClicksOverTime = async (
       uniqueVisitors: number;
     }>;
   } catch (error) {
-    console.error("Failed to fetch clicks over time", { error, linkId });
+    logger.error({ error, linkId }, "Failed to fetch clicks over time");
     return [];
   }
 };
@@ -208,7 +209,7 @@ export const getCountriesData = async (
       visitors: Number(row.visitors),
     }));
   } catch (error) {
-    console.error("Failed to fetch countries data", { error, linkId });
+    logger.error({ error, linkId }, "Failed to fetch countries data");
     return [];
   }
 };
@@ -262,7 +263,7 @@ export const getDevicesData = async (
       };
     });
   } catch (error) {
-    console.error("Failed to fetch devices data", { error, linkId });
+    logger.error({ error, linkId }, "Failed to fetch devices data");
     return [];
   }
 };
@@ -306,7 +307,7 @@ export const getDashboardMetrics = async (
       uniqueVisitors: Number(metrics.unique_visitors),
     };
   } catch (error) {
-    console.error("Failed to fetch dashboard metrics", { error });
+    logger.error({ error }, "Failed to fetch dashboard metrics");
     return { totalLinks: 0, totalClicks: 0, uniqueVisitors: 0 };
   }
 };
@@ -342,7 +343,7 @@ export const getAvailableCountries = async (
 
     return data.data;
   } catch (error) {
-    console.error("Failed to fetch available countries", { error, linkId });
+    logger.error({ error, linkId }, "Failed to fetch available countries");
     return [];
   }
 };
@@ -378,7 +379,7 @@ export const getAvailableDevices = async (
 
     return data.data;
   } catch (error) {
-    console.error("Failed to fetch available devices", { error, linkId });
+    logger.error({ error, linkId }, "Failed to fetch available devices");
     return [];
   }
 };
