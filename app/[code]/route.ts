@@ -1,44 +1,12 @@
 import { getLinkByShortCode } from "@/data/links";
 import { prisma } from "@/lib/db";
-import { getRequestContext, getRequestDiagnostics } from "@/lib/server-utils";
+import { getRequestContext } from "@/lib/server-utils";
 import { NextResponse, after } from "next/server";
 import crypto from "node:crypto";
 import { tinybird } from "@/lib/tinybird";
 
 const sha256 = (value: string) =>
   crypto.createHash("sha256").update(value).digest("hex");
-
-const hasToken = (value: string, token: string) => {
-  return value
-    .toLowerCase()
-    .split(/[\s,;]+/)
-    .filter(Boolean)
-    .includes(token);
-};
-
-const shouldTrackClick = (
-  diagnostics: ReturnType<typeof getRequestDiagnostics>,
-) => {
-  const isPrefetchLike =
-    hasToken(diagnostics.purpose, "prefetch") ||
-    hasToken(diagnostics.secPurpose, "prefetch") ||
-    hasToken(diagnostics.secPurpose, "prerender") ||
-    hasToken(diagnostics.purpose, "prerender");
-
-  if (isPrefetchLike) {
-    return false;
-  }
-
-  if (diagnostics.secFetchMode && diagnostics.secFetchMode !== "navigate") {
-    return false;
-  }
-
-  if (diagnostics.secFetchDest && diagnostics.secFetchDest !== "document") {
-    return false;
-  }
-
-  return true;
-};
 
 const saveClickEvent = async (
   linkId: string,
@@ -99,11 +67,6 @@ export const GET = async (
 
   if (!link) {
     return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  const diagnostic = await getRequestDiagnostics(request);
-  if (!shouldTrackClick(diagnostic)) {
-    return NextResponse.redirect(link.originalUrl);
   }
 
   const targetUrl = link.originalUrl;

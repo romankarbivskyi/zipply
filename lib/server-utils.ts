@@ -21,19 +21,3 @@ export const getRequestContext = async (
     browser: browser.name || "Unknown",
   };
 };
-
-export const getRequestDiagnostics = (req: Request) => {
-  const headers = req.headers;
-
-  return {
-    method: req.method,
-    purpose: headers.get("purpose") || "",
-    secPurpose: headers.get("sec-purpose") || "",
-    secFetchMode: headers.get("sec-fetch-mode") || "",
-    secFetchDest: headers.get("sec-fetch-dest") || "",
-    secFetchSite: headers.get("sec-fetch-site") || "",
-    secFetchUser: headers.get("sec-fetch-user") || "",
-    referer: headers.get("referer") || "",
-    userAgent: headers.get("user-agent") || "",
-  };
-};
