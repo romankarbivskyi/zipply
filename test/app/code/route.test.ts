@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GET } from "@/app/[code]/route";
 import { getLinkByShortCode } from "@/data/links";
-import { getRequestContext, getRequestDiagnostics } from "@/lib/server-utils";
+import { getRequestContext } from "@/lib/server-utils";
 import { NextResponse, after } from "next/server";
 import { tinybird } from "@/lib/tinybird";
 import { prisma } from "@/lib/db";
@@ -13,7 +13,6 @@ vi.mock("@/data/links", () => ({
 }));
 
 vi.mock("@/lib/server-utils", () => ({
-  getRequestDiagnostics: vi.fn(),
   getRequestContext: vi.fn(),
 }));
 
@@ -66,53 +65,12 @@ describe("GET /[code]", () => {
     );
   });
 
-  it("redirects to originalUrl without tracking for prefetch requests", async () => {
-    vi.mocked(getLinkByShortCode).mockResolvedValueOnce({
-      id: "1",
-      originalUrl: "https://example.com",
-      userId: "user1",
-    } as Link);
-
-    vi.mocked(getRequestDiagnostics).mockReturnValue({
-      method: "GET",
-      purpose: "prefetch",
-      secPurpose: "",
-      secFetchMode: "navigate",
-      secFetchDest: "document",
-      secFetchSite: "",
-      secFetchUser: "",
-      referer: "",
-      userAgent: "test-agent",
-    });
-
-    const response = await GET(mockRequest, {
-      params: Promise.resolve({ code: "found" }),
-    });
-
-    expect(response.status).toBe(307);
-    expect(NextResponse.redirect).toHaveBeenCalledWith("https://example.com");
-
-    expect(after).not.toHaveBeenCalled();
-  });
-
   it("redirects and tracks for normal requests", async () => {
     vi.mocked(getLinkByShortCode).mockResolvedValueOnce({
       id: "link1",
       originalUrl: "https://example.com",
       userId: "user1",
     } as Link);
-
-    vi.mocked(getRequestDiagnostics).mockReturnValue({
-      method: "GET",
-      purpose: "",
-      secPurpose: "",
-      secFetchMode: "navigate",
-      secFetchDest: "document",
-      secFetchSite: "",
-      secFetchUser: "",
-      referer: "",
-      userAgent: "test-agent",
-    });
 
     vi.mocked(getRequestContext).mockResolvedValue({
       ip: "127.0.0.1",
@@ -152,18 +110,6 @@ describe("GET /[code]", () => {
       originalUrl: "https://example.com",
       userId: "user1",
     } as Link);
-
-    vi.mocked(getRequestDiagnostics).mockReturnValue({
-      method: "GET",
-      purpose: "",
-      secPurpose: "",
-      secFetchMode: "navigate",
-      secFetchDest: "document",
-      secFetchSite: "",
-      secFetchUser: "",
-      referer: "",
-      userAgent: "test-agent",
-    });
 
     vi.mocked(getRequestContext).mockResolvedValue({
       country: "Unknown",
