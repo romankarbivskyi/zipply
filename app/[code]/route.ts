@@ -86,9 +86,7 @@ export const GET = async (
 
   const targetUrl = link.originalUrl;
 
-  after(() => {
-    saveClickEvent(link.id, link.userId, stats);
-  });
+  after(() => saveClickEvent(link.id, link.userId, stats));
 
   return NextResponse.redirect(targetUrl);
 };
