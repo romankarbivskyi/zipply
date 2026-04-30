@@ -44,6 +44,13 @@ vi.mock("@/lib/db", () => ({
 describe("GET /[code]", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(getRequestContext).mockResolvedValue({
+      country: "Unknown",
+      city: "Unknown",
+      device: "Unknown",
+      os: "Unknown",
+      browser: "Unknown",
+    } satisfies RequestContext);
   });
 
   const mockRequest = new Request("http://localhost:3000/xyz", {

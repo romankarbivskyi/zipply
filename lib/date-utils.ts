@@ -1,4 +1,5 @@
 import { eachDayOfInterval, parseISO, format } from "date-fns";
+import { logger } from "@/lib/logger";
 
 interface DateRow {
   date: string;
@@ -37,7 +38,7 @@ export const fillMissingDates = (
       return newRow;
     });
   } catch (error) {
-    console.error("Error filling missing dates:", error);
+    logger.error({ error }, "Error filling missing dates");
     return data;
   }
 };
@@ -50,7 +51,7 @@ export const formatDateRange = (fromDate: string, toDate: string): string => {
     const endStr = format(end, "MMM d, yyyy");
     return `${startStr} - ${endStr}`;
   } catch (error) {
-    console.error("Error formatting date range:", error);
+    logger.error({ error }, "Error formatting date range");
     return "the selected period";
   }
 };

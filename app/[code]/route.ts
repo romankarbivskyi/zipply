@@ -4,6 +4,8 @@ import { getRequestContext } from "@/lib/server-utils";
 import { NextResponse, after } from "next/server";
 import crypto from "node:crypto";
 import { tinybird } from "@/lib/tinybird";
+import { logger } from "@/lib/logger";
+import type { RequestContext } from "@/types/request";
 
 const sha256 = (value: string) =>
   crypto.createHash("sha256").update(value).digest("hex");
@@ -11,11 +13,9 @@ const sha256 = (value: string) =>
 const saveClickEvent = async (
   linkId: string,
   userId: string,
-  request: Request,
+  stats: RequestContext,
 ) => {
   try {
-    const stats = await getRequestContext(request);
-
     const ts = new Date();
 
     const base = [
@@ -43,17 +43,17 @@ const saveClickEvent = async (
           browser: stats.browser ?? "Unknown",
           os: stats.os ?? "Unknown",
         })
-        .catch((err) => console.error("Tinybird ingest failed:", err)),
+        .catch((err) => logger.error({ err }, "Tinybird ingest failed")),
 
       prisma.link
         .update({
           where: { id: linkId },
           data: { clicks: { increment: 1 } },
         })
-        .catch((err) => console.error("Prisma update failed:", err)),
+        .catch((err) => logger.error({ err }, "Prisma update failed")),
     ]);
   } catch (error) {
-    console.error("Failed to store click event", { linkId, error });
+    logger.error({ error, linkId }, "Failed to store click event");
   }
 };
 
@@ -62,17 +62,32 @@ export const GET = async (
   { params }: { params: Promise<{ code: string }> },
 ) => {
   const { code } = await params;
+  const stats = await getRequestContext(request);
+
+  logger.info(
+    {
+      code,
+      url: request.url,
+      ip: stats.ip,
+      country: stats.country,
+      device: stats.device,
+      os: stats.os,
+      browser: stats.browser,
+    },
+    "Short link requested",
+  );
 
   const link = await getLinkByShortCode(code);
 
   if (!link) {
+    logger.warn({ code }, "Short link not found");
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   const targetUrl = link.originalUrl;
 
   after(() => {
-    saveClickEvent(link.id, link.userId, request);
+    saveClickEvent(link.id, link.userId, stats);
   });
 
   return NextResponse.redirect(targetUrl);
