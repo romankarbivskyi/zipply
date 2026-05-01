@@ -12,6 +12,7 @@ import {
   SidebarRail,
   SidebarGroup,
   SidebarGroupContent,
+  useSidebar,
 } from "../ui/sidebar";
 import { DASHBOARD_NAVIGATION } from "@/constants";
 import Link from "next/link";
@@ -27,12 +28,19 @@ import { authClient } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { IconDotsVertical } from "@tabler/icons-react";
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const AppSidebar = () => {
   const { data: session } = authClient.useSession();
 
   const router = useRouter();
+  const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
+
+  useEffect(() => {
+    setOpenMobile(false);
+  }, [pathname, setOpenMobile]);
 
   const handleSignOut = async () => {
     await authClient.signOut({
