@@ -3,9 +3,13 @@ import {
   VisitorsChartSkeleton,
   CountriesChartSkeleton,
   DevicesChartSkeleton,
+  BrowsersChartSkeleton,
+  OSChartSkeleton,
 } from "@/components/dashboard/charts/chart-skeletons";
 import CountriesChart from "@/components/dashboard/charts/countries-chart";
 import DevicesChart from "@/components/dashboard/charts/devices-chart";
+import BrowsersChart from "@/components/dashboard/charts/browsers-chart";
+import OSChart from "@/components/dashboard/charts/os-chart";
 import VisitorsChart from "@/components/dashboard/charts/visitors-chart";
 import CalendarRange from "@/components/dashboard/calendar-range";
 import Heading from "@/components/dashboard/heading";
@@ -14,6 +18,8 @@ import {
   getClicksOverTime,
   getCountriesData,
   getDevicesData,
+  getBrowsersData,
+  getOSData,
   getLinkById,
   getAvailableCountries,
   getAvailableDevices,
@@ -57,6 +63,8 @@ export default async function Page({
 
   const clicksData = getClicksOverTime(linkId, from, to, country, device);
   const devicesData = getDevicesData(linkId, from, to, country, device);
+  const browsersData = getBrowsersData(linkId, from, to, country, device);
+  const osData = getOSData(linkId, from, to, country, device);
   const countriesData = getCountriesData(linkId, from, to, country, device);
   const allCountries = getAvailableCountries(linkId, from, to);
   const allDevices = getAvailableDevices(linkId, from, to);
@@ -80,6 +88,12 @@ export default async function Page({
           </Suspense>
           <Suspense fallback={<DevicesChartSkeleton />}>
             <DevicesChart data={devicesData} />
+          </Suspense>
+          <Suspense fallback={<BrowsersChartSkeleton />}>
+            <BrowsersChart data={browsersData} />
+          </Suspense>
+          <Suspense fallback={<OSChartSkeleton />}>
+            <OSChart data={osData} />
           </Suspense>
         </div>
       </div>

@@ -178,6 +178,100 @@ export const devicesData = defineEndpoint("devices_data", {
 export type DevicesDataParams = InferParams<typeof devicesData>;
 export type DevicesDataOutput = InferOutputRow<typeof devicesData>;
 
+export const browsersData = defineEndpoint("browsers_data", {
+  description: "Get click breakdown by browser",
+  params: {
+    user_id: p.string().describe("User ID"),
+    from_date: p.string().describe("Start date (YYYY-MM-DD)"),
+    to_date: p.string().describe("End date (YYYY-MM-DD)"),
+    link_id: p.string().optional("").describe("Optional specific link ID"),
+    country: p.string().optional("").describe("Optional country filter"),
+    device: p.string().optional("").describe("Optional device filter"),
+  },
+  nodes: [
+    node({
+      name: "aggregated",
+      sql: `
+        SELECT
+          browser,
+          count() as visitors
+        FROM click_events
+        WHERE user_id = {{String(user_id, '')}}
+          AND ts >= toDateTimeOrNull({{String(from_date, '1970-01-01')}})
+          AND ts < toDateTimeOrNull({{String(to_date, '2100-01-01')}}) + INTERVAL 1 DAY
+          AND (
+            {{String(link_id, '')}} = ''
+            OR link_id = {{String(link_id, '')}}
+          )
+          AND (
+            {{String(country, '')}} = ''
+            OR country = {{String(country, '')}}
+          )
+          AND (
+            {{String(device, '')}} = ''
+            OR device = {{String(device, '')}}
+          )
+        GROUP BY browser
+        ORDER BY visitors DESC
+      `,
+    }),
+  ],
+  output: {
+    browser: t.string(),
+    visitors: t.uint64(),
+  },
+});
+
+export type BrowsersDataParams = InferParams<typeof browsersData>;
+export type BrowsersDataOutput = InferOutputRow<typeof browsersData>;
+
+export const osData = defineEndpoint("os_data", {
+  description: "Get click breakdown by OS",
+  params: {
+    user_id: p.string().describe("User ID"),
+    from_date: p.string().describe("Start date (YYYY-MM-DD)"),
+    to_date: p.string().describe("End date (YYYY-MM-DD)"),
+    link_id: p.string().optional("").describe("Optional specific link ID"),
+    country: p.string().optional("").describe("Optional country filter"),
+    device: p.string().optional("").describe("Optional device filter"),
+  },
+  nodes: [
+    node({
+      name: "aggregated",
+      sql: `
+        SELECT
+          os,
+          count() as visitors
+        FROM click_events
+        WHERE user_id = {{String(user_id, '')}}
+          AND ts >= toDateTimeOrNull({{String(from_date, '1970-01-01')}})
+          AND ts < toDateTimeOrNull({{String(to_date, '2100-01-01')}}) + INTERVAL 1 DAY
+          AND (
+            {{String(link_id, '')}} = ''
+            OR link_id = {{String(link_id, '')}}
+          )
+          AND (
+            {{String(country, '')}} = ''
+            OR country = {{String(country, '')}}
+          )
+          AND (
+            {{String(device, '')}} = ''
+            OR device = {{String(device, '')}}
+          )
+        GROUP BY os
+        ORDER BY visitors DESC
+      `,
+    }),
+  ],
+  output: {
+    os: t.string(),
+    visitors: t.uint64(),
+  },
+});
+
+export type OSDataParams = InferParams<typeof osData>;
+export type OSDataOutput = InferOutputRow<typeof osData>;
+
 export const dashboardMetrics = defineEndpoint("dashboard_metrics", {
   description: "Get total clicks and unique visitors for dashboard",
   params: {
@@ -296,6 +390,8 @@ export const tinybird = new Tinybird({
     clicksOverTime,
     countriesData,
     devicesData,
+    browsersData,
+    osData,
     dashboardMetrics,
     availableCountries,
     availableDevices,

@@ -14,24 +14,23 @@ import {
 import { use, useMemo } from "react";
 
 interface ChartData {
-  device: string;
+  os: string;
   visitors: number;
   fill: string;
 }
 
-interface DevicesChartProps {
+interface OSChartProps {
   data: Promise<ChartData[]>;
 }
 
-const DevicesChart = ({ data }: DevicesChartProps) => {
+const OSChart = ({ data }: OSChartProps) => {
   const chartData = use(data);
 
   const dynamicConfig = useMemo(() => {
     return chartData.reduce(
       (config, item) => {
-        const key = item.device;
-        config[key] = {
-          label: key.charAt(0).toUpperCase() + key.slice(1),
+        config[item.os] = {
+          label: item.os,
           color: item.fill,
         };
         return config;
@@ -45,7 +44,7 @@ const DevicesChart = ({ data }: DevicesChartProps) => {
   return (
     <Card className="flex flex-col">
       <CardHeader>
-        <CardTitle>Devices</CardTitle>
+        <CardTitle>Operating Systems</CardTitle>
       </CardHeader>
       <CardContent className="flex-1">
         {!chartData.length ? (
@@ -65,12 +64,11 @@ const DevicesChart = ({ data }: DevicesChartProps) => {
               <Pie
                 data={chartData}
                 dataKey="visitors"
-                nameKey="device"
-                innerRadius={60}
+                nameKey="os"
                 strokeWidth={2}
               />
               <ChartLegend
-                content={<ChartLegendContent nameKey="device" />}
+                content={<ChartLegendContent nameKey="os" />}
                 className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
               />
             </PieChart>
@@ -81,4 +79,4 @@ const DevicesChart = ({ data }: DevicesChartProps) => {
   );
 };
 
-export default DevicesChart;
+export default OSChart;

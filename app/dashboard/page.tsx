@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import CountriesChart from "@/components/dashboard/charts/countries-chart";
 import CalendarRange from "@/components/dashboard/calendar-range";
 import DevicesChart from "@/components/dashboard/charts/devices-chart";
+import BrowsersChart from "@/components/dashboard/charts/browsers-chart";
+import OSChart from "@/components/dashboard/charts/os-chart";
 import Heading from "@/components/dashboard/heading";
 import SectionCards from "@/components/dashboard/section-cards";
 import VisitorsChart from "@/components/dashboard/charts/visitors-chart";
@@ -9,6 +11,8 @@ import {
   VisitorsChartSkeleton,
   CountriesChartSkeleton,
   DevicesChartSkeleton,
+  BrowsersChartSkeleton,
+  OSChartSkeleton,
   SectionCardsSkeleton,
 } from "@/components/dashboard/charts/chart-skeletons";
 import { Suspense } from "react";
@@ -17,6 +21,8 @@ import {
   getCountriesData,
   getDashboardMetrics,
   getDevicesData,
+  getBrowsersData,
+  getOSData,
   getAvailableCountries,
   getAvailableDevices,
 } from "@/data/links";
@@ -48,6 +54,8 @@ export default async function Page({
 
   const clicksData = getClicksOverTime(undefined, from, to, country, device);
   const devicesData = getDevicesData(undefined, from, to, country, device);
+  const browsersData = getBrowsersData(undefined, from, to, country, device);
+  const osData = getOSData(undefined, from, to, country, device);
   const countriesData = getCountriesData(undefined, from, to, country, device);
   const allCountries = getAvailableCountries(undefined, from, to);
   const allDevices = getAvailableDevices(undefined, from, to);
@@ -74,6 +82,12 @@ export default async function Page({
           </Suspense>
           <Suspense fallback={<DevicesChartSkeleton />}>
             <DevicesChart data={devicesData} />
+          </Suspense>
+          <Suspense fallback={<BrowsersChartSkeleton />}>
+            <BrowsersChart data={browsersData} />
+          </Suspense>
+          <Suspense fallback={<OSChartSkeleton />}>
+            <OSChart data={osData} />
           </Suspense>
         </div>
       </div>
