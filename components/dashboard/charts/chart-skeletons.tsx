@@ -75,6 +75,48 @@ export const DevicesChartSkeleton = () => {
   );
 };
 
+export const BrowsersChartSkeleton = () => {
+  return (
+    <Card className="flex flex-col">
+      <CardHeader>
+        <Skeleton className="h-5 w-24" />
+      </CardHeader>
+      <CardContent className="flex flex-1 flex-col items-center justify-center">
+        <Skeleton className="size-[180px] rounded-full" />
+        <div className="mt-4 flex flex-wrap justify-center gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-1.5">
+              <Skeleton className="size-3 rounded-full" />
+              <Skeleton className="h-3 w-12" />
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export const OSChartSkeleton = () => {
+  return (
+    <Card className="flex flex-col">
+      <CardHeader>
+        <Skeleton className="h-5 w-24" />
+      </CardHeader>
+      <CardContent className="flex flex-1 flex-col items-center justify-center">
+        <Skeleton className="size-[180px] rounded-full" />
+        <div className="mt-4 flex flex-wrap justify-center gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-1.5">
+              <Skeleton className="size-3 rounded-full" />
+              <Skeleton className="h-3 w-12" />
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 export const SectionCardsSkeleton = () => {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

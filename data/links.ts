@@ -13,6 +13,8 @@ import {
   type DashboardMetricsOutput,
   type AvailableCountriesOutput,
   type AvailableDevicesOutput,
+  type BrowsersDataOutput,
+  type OSDataOutput,
 } from "@/lib/tinybird";
 
 export interface DashboardMetrics {
@@ -247,23 +249,110 @@ export const getDevicesData = async (
       device: device || "",
     });
 
-    const colorMap: Record<string, string> = {
-      desktop: "var(--color-desktop)",
-      mobile: "var(--color-mobile)",
-      tablet: "var(--color-tablet)",
-      unknown: "var(--color-unknown)",
-    };
-
-    return data.data.map((row: DevicesDataOutput) => {
+    return data.data.map((row: DevicesDataOutput, index: number) => {
       const dev = (row.device || "other").toLowerCase();
       return {
         device: dev,
         visitors: Number(row.visitors),
-        fill: colorMap[dev] || "var(--color-other)",
+        fill: `var(--chart-${(index % 5) + 1})`,
       };
     });
   } catch (error) {
     logger.error({ error, linkId }, "Failed to fetch devices data");
+    return [];
+  }
+};
+
+export const getBrowsersData = async (
+  linkId?: string,
+  fromDate?: string,
+  toDate?: string,
+  country?: string,
+  device?: string,
+) => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) return [];
+
+  if (!fromDate || !toDate) return [];
+
+  if (linkId) {
+    const link = await prisma.link.findFirst({
+      where: { id: linkId, userId: session.user.id },
+      select: { id: true },
+    });
+    if (!link) return [];
+  }
+
+  try {
+    const data = await tinybird.browsersData.query({
+      user_id: session.user.id,
+      from_date: fromDate,
+      to_date: toDate,
+      link_id: linkId || "",
+      country: country || "",
+      device: device || "",
+    });
+
+    return data.data.map((row: BrowsersDataOutput, index: number) => {
+      const browser = row.browser || "Unknown";
+      return {
+        browser: browser,
+        visitors: Number(row.visitors),
+        fill: `var(--chart-${(index % 5) + 1})`,
+      };
+    });
+  } catch (error) {
+    logger.error({ error, linkId }, "Failed to fetch browsers data");
+    return [];
+  }
+};
+
+export const getOSData = async (
+  linkId?: string,
+  fromDate?: string,
+  toDate?: string,
+  country?: string,
+  device?: string,
+) => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) return [];
+
+  if (!fromDate || !toDate) return [];
+
+  if (linkId) {
+    const link = await prisma.link.findFirst({
+      where: { id: linkId, userId: session.user.id },
+      select: { id: true },
+    });
+    if (!link) return [];
+  }
+
+  try {
+    const data = await tinybird.osData.query({
+      user_id: session.user.id,
+      from_date: fromDate,
+      to_date: toDate,
+      link_id: linkId || "",
+      country: country || "",
+      device: device || "",
+    });
+
+    return data.data.map((row: OSDataOutput, index: number) => {
+      const os = row.os || "Unknown";
+      return {
+        os: os,
+        visitors: Number(row.visitors),
+        fill: `var(--chart-${(index % 5) + 1})`,
+      };
+    });
+  } catch (error) {
+    logger.error({ error, linkId }, "Failed to fetch OS data");
     return [];
   }
 };

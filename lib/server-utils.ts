@@ -17,7 +17,7 @@ export const getRequestContext = async (
     country: geo.country || "Unknown",
     city: geo.city || "Unknown",
     os: os.name || "Unknown",
-    device: device.type || "Unknown",
+    device: device.type || "desktop",
     browser: browser.name || "Unknown",
   };
 };
