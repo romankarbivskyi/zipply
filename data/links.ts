@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { unstable_cache } from "next/cache";
 import { Link } from "@/lib/generated/prisma/client";
 import { LINKS_PER_PAGE } from "@/constants";
 import { fillMissingDates } from "@/lib/date-utils";
@@ -89,15 +90,24 @@ export const fetchLinksPages = async (search: string) => {
 export const getLinkByShortCode = async (
   shortCode: string,
 ): Promise<Link | null> => {
-  try {
-    const link = await prisma.link.findUnique({
-      where: { shortCode },
-    });
+  const getCachedLink = unstable_cache(
+    async () => {
+      try {
+        return await prisma.link.findUnique({
+          where: { shortCode },
+        });
+      } catch {
+        return null;
+      }
+    },
+    [`link-code-${shortCode}`],
+    {
+      tags: [`link-code-${shortCode}`, "links"],
+      revalidate: 3600,
+    },
+  );
 
-    return link;
-  } catch {
-    return null;
-  }
+  return getCachedLink();
 };
 
 export const getLinkById = async (id: string): Promise<Link | null> => {

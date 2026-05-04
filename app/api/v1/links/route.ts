@@ -4,6 +4,7 @@ import { getMetadata } from "@/lib/metadata";
 import { nanoid } from "nanoid";
 import { LINKS_PER_PAGE } from "@/constants";
 import { resolveApiSession, unauthorized, badRequest } from "@/lib/api-auth";
+import { revalidateTag } from "next/cache";
 
 export const GET = async (req: Request) => {
   const session = await resolveApiSession(req);
@@ -87,6 +88,8 @@ export const POST = async (req: Request) => {
     },
   });
 
+  revalidateTag("links", "max");
+
   return Response.json({ data: link }, { status: 201 });
 };
 
@@ -106,9 +109,20 @@ export const DELETE = async (req: Request) => {
     return badRequest("ids must be a non-empty array");
   }
 
-  await prisma.link.deleteMany({
-    where: { id: { in: ids as string[] }, userId: session.userId },
+  const idsToDelete = ids as string[];
+  const linksToDelete = await prisma.link.findMany({
+    where: { id: { in: idsToDelete }, userId: session.userId },
+    select: { shortCode: true },
   });
+
+  await prisma.link.deleteMany({
+    where: { id: { in: idsToDelete }, userId: session.userId },
+  });
+
+  linksToDelete.forEach((l) =>
+    revalidateTag(`link-code-${l.shortCode}`, "max"),
+  );
+  revalidateTag("links", "max");
 
   return Response.json({ success: true });
 };

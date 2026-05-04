@@ -8,6 +8,7 @@ import {
   badRequest,
   notFound,
 } from "@/lib/api-auth";
+import { revalidateTag } from "next/cache";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -70,6 +71,12 @@ export const PATCH = async (req: Request, { params }: RouteContext) => {
     data: { originalUrl: url, shortCode: code, title, favicon, tags },
   });
 
+  revalidateTag(`link-code-${existing.shortCode}`, "max");
+  if (existing.shortCode !== code) {
+    revalidateTag(`link-code-${code}`, "max");
+  }
+  revalidateTag("links", "max");
+
   return Response.json({ data: link });
 };
 
@@ -85,6 +92,9 @@ export const DELETE = async (req: Request, { params }: RouteContext) => {
   if (!existing) return notFound();
 
   await prisma.link.delete({ where: { id } });
+
+  revalidateTag(`link-code-${existing.shortCode}`, "max");
+  revalidateTag("links", "max");
 
   return Response.json({ success: true });
 };
