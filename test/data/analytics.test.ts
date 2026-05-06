@@ -3,7 +3,6 @@ import {
   queryClicksOverTime,
   queryCountriesData,
   queryDevicesData,
-  queryBrowsersData,
   queryOSData,
 } from "@/data/analytics";
 import { tinybird } from "@/lib/tinybird";
@@ -46,7 +45,7 @@ describe("data/analytics", () => {
     const mockDbData = [{ date: "2024-01-01", clicks: 10, unique_visitors: 5 }];
     vi.mocked(tinybird.clicksOverTime.query).mockResolvedValueOnce({
       data: mockDbData,
-    } as any);
+    } as never);
 
     const result = await queryClicksOverTime(baseParams);
 
@@ -73,7 +72,7 @@ describe("data/analytics", () => {
   it("queryCountriesData maps correctly", async () => {
     vi.mocked(tinybird.countriesData.query).mockResolvedValueOnce({
       data: [{ country: "US", visitors: 100 }],
-    } as any);
+    } as never);
 
     const result = await queryCountriesData(baseParams);
 
@@ -86,7 +85,7 @@ describe("data/analytics", () => {
         { device: "Desktop", visitors: 50 },
         { device: null, visitors: 10 },
       ],
-    } as any);
+    } as never);
 
     const result = await queryDevicesData(baseParams);
 

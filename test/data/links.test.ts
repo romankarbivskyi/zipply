@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   fetchFilteredLinks,
-  fetchLinksPages,
   getLinkByShortCode,
   getLinkById,
   getDashboardMetrics,
@@ -66,7 +65,7 @@ describe("data/links", () => {
     it("fetchFilteredLinks queries prisma with user id", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValueOnce({
         user: { id: "user123" },
-      } as any);
+      } as never);
 
       vi.mocked(prisma.link.findMany).mockResolvedValueOnce([]);
 
@@ -90,7 +89,7 @@ describe("data/links", () => {
     it("getLinkById ensures the link belongs to the session user", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValueOnce({
         user: { id: "user123" },
-      } as any);
+      } as never);
 
       await getLinkById("linkABC");
 
@@ -105,12 +104,12 @@ describe("data/links", () => {
     it("getDashboardMetrics combines prisma count and tinybird metrics", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValueOnce({
         user: { id: "user123" },
-      } as any);
+      } as never);
 
       vi.mocked(prisma.link.count).mockResolvedValueOnce(42);
       vi.mocked(tinybird.dashboardMetrics.query).mockResolvedValueOnce({
         data: [{ total_clicks: 150, unique_visitors: 99 }],
-      } as any);
+      } as never);
 
       const result = await getDashboardMetrics("2024-01-01", "2024-01-31");
 
@@ -135,7 +134,7 @@ describe("data/links", () => {
       vi.mocked(prisma.link.findUnique).mockResolvedValueOnce({
         id: "link-id",
         shortCode: "xyz",
-      } as any);
+      } as never);
 
       const result = await getLinkByShortCode("xyz");
 
