@@ -16,7 +16,6 @@ import { use, useMemo } from "react";
 interface ChartData {
   os: string;
   visitors: number;
-  fill: string;
 }
 
 interface OSChartProps {
@@ -26,8 +25,17 @@ interface OSChartProps {
 const OSChart = ({ data }: OSChartProps) => {
   const chartData = use(data);
 
+  const chartDataWithFill = useMemo(
+    () =>
+      chartData.map((item, index) => ({
+        ...item,
+        fill: `var(--chart-${(index % 5) + 1})`,
+      })),
+    [chartData],
+  );
+
   const dynamicConfig = useMemo(() => {
-    return chartData.reduce(
+    return chartDataWithFill.reduce(
       (config, item) => {
         config[item.os] = {
           label: item.os,
@@ -39,7 +47,7 @@ const OSChart = ({ data }: OSChartProps) => {
         visitors: { label: "Visitors" },
       } as ChartConfig,
     );
-  }, [chartData]);
+  }, [chartDataWithFill]);
 
   return (
     <Card className="flex flex-col">
@@ -47,7 +55,7 @@ const OSChart = ({ data }: OSChartProps) => {
         <CardTitle>Operating Systems</CardTitle>
       </CardHeader>
       <CardContent className="flex-1">
-        {!chartData.length ? (
+        {!chartDataWithFill.length ? (
           <div className="flex h-[250px] flex-col items-center justify-center gap-2">
             <p className="text-muted-foreground text-sm">No data available</p>
           </div>
@@ -62,7 +70,7 @@ const OSChart = ({ data }: OSChartProps) => {
                 content={<ChartTooltipContent hideLabel />}
               />
               <Pie
-                data={chartData}
+                data={chartDataWithFill}
                 dataKey="visitors"
                 nameKey="os"
                 strokeWidth={2}

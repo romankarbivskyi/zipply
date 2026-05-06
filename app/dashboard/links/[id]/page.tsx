@@ -14,21 +14,23 @@ import VisitorsChart from "@/components/dashboard/charts/visitors-chart";
 import CalendarRange from "@/components/dashboard/calendar-range";
 import Heading from "@/components/dashboard/heading";
 import LinkCard from "@/components/dashboard/links/link-card";
+import { getLinkById } from "@/data/links";
 import {
-  getClicksOverTime,
-  getCountriesData,
-  getDevicesData,
-  getBrowsersData,
-  getOSData,
-  getLinkById,
-  getAvailableCountries,
-  getAvailableDevices,
-} from "@/data/links";
-import { notFound } from "next/navigation";
+  queryClicksOverTime,
+  queryCountriesData,
+  queryDevicesData,
+  queryBrowsersData,
+  queryOSData,
+  queryAvailableCountries,
+  queryAvailableDevices,
+} from "@/data/analytics";
+import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import CountrySelect from "@/components/dashboard/country-select";
 import DeviceSelect from "@/components/dashboard/device-select";
 import { getParam } from "@/lib/utils";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Analytics",
@@ -41,8 +43,17 @@ export default async function Page({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) redirect("/sign-in");
+
   const linkId = (await params).id;
   const paramsData = await searchParams;
+
+  const link = await getLinkById(linkId);
+  if (!link) notFound();
 
   const today = new Date();
   const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -55,19 +66,33 @@ export default async function Page({
   const deviceParam = getParam(paramsData.device);
   const device = deviceParam === "all" ? "" : deviceParam;
 
-  const link = await getLinkById(linkId);
+  const userId = session.user.id;
+  const queryParams = {
+    userId,
+    fromDate: from,
+    toDate: to,
+    linkId,
+    country,
+    device,
+  };
 
-  if (!link) {
-    notFound();
-  }
-
-  const clicksData = getClicksOverTime(linkId, from, to, country, device);
-  const devicesData = getDevicesData(linkId, from, to, country, device);
-  const browsersData = getBrowsersData(linkId, from, to, country, device);
-  const osData = getOSData(linkId, from, to, country, device);
-  const countriesData = getCountriesData(linkId, from, to, country, device);
-  const allCountries = getAvailableCountries(linkId, from, to);
-  const allDevices = getAvailableDevices(linkId, from, to);
+  const clicksData = queryClicksOverTime(queryParams);
+  const devicesData = queryDevicesData(queryParams);
+  const browsersData = queryBrowsersData(queryParams);
+  const osData = queryOSData(queryParams);
+  const countriesData = queryCountriesData(queryParams);
+  const allCountries = queryAvailableCountries({
+    userId,
+    fromDate: from,
+    toDate: to,
+    linkId,
+  });
+  const allDevices = queryAvailableDevices({
+    userId,
+    fromDate: from,
+    toDate: to,
+    linkId,
+  });
 
   return (
     <div className="flex flex-1 flex-col">

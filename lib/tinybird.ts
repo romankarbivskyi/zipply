@@ -385,6 +385,7 @@ export const availableDevices = defineEndpoint("available_devices", {
 export type AvailableDevicesOutput = InferOutputRow<typeof availableDevices>;
 
 export const tinybird = new Tinybird({
+  devMode: false,
   datasources: { clicks },
   pipes: {
     clicksOverTime,
