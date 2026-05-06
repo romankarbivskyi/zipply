@@ -4,6 +4,8 @@ import {
   type ClicksOverTimeOutput,
   type CountriesDataOutput,
   type DevicesDataOutput,
+  type BrowsersDataOutput,
+  type OSDataOutput,
 } from "@/lib/tinybird";
 import {
   resolveApiSession,
@@ -45,45 +47,75 @@ export const GET = async (req: Request, { params }: RouteContext) => {
     link_id: id,
   };
 
-  const [clicksOverTime, countriesData, devicesData] = await Promise.all([
-    tinybird.clicksOverTime
-      .query(queryParams)
-      .then((res) => {
-        const data = res.data.map((row: ClicksOverTimeOutput) => ({
-          date: row.date,
-          clicks: Number(row.clicks),
-          uniqueVisitors: Number(row.unique_visitors),
-        }));
-        return fillMissingDates(data, from, to) as Array<{
-          date: string;
-          clicks: number;
-          uniqueVisitors: number;
-        }>;
-      })
-      .catch(() => []),
+  const [clicksOverTime, countriesData, devicesData, browsersData, osData] =
+    await Promise.all([
+      tinybird.clicksOverTime
+        .query(queryParams)
+        .then((res) => {
+          const data = res.data.map((row: ClicksOverTimeOutput) => ({
+            date: row.date,
+            clicks: Number(row.clicks),
+            uniqueVisitors: Number(row.unique_visitors),
+          }));
+          return fillMissingDates(data, from, to) as Array<{
+            date: string;
+            clicks: number;
+            uniqueVisitors: number;
+          }>;
+        })
+        .catch(() => []),
 
-    tinybird.countriesData
-      .query(queryParams)
-      .then((res) =>
-        res.data.map((row: CountriesDataOutput) => ({
-          country: row.country,
-          visitors: Number(row.visitors),
-        })),
-      )
-      .catch(() => []),
+      tinybird.countriesData
+        .query(queryParams)
+        .then((res) =>
+          res.data.map((row: CountriesDataOutput) => ({
+            country: row.country,
+            visitors: Number(row.visitors),
+          })),
+        )
+        .catch(() => []),
 
-    tinybird.devicesData
-      .query(queryParams)
-      .then((res) =>
-        res.data.map((row: DevicesDataOutput) => ({
-          device: (row.device || "other").toLowerCase(),
-          visitors: Number(row.visitors),
-        })),
-      )
-      .catch(() => []),
-  ]);
+      tinybird.devicesData
+        .query(queryParams)
+        .then((res) =>
+          res.data.map((row: DevicesDataOutput) => ({
+            device: (row.device || "other").toLowerCase(),
+            visitors: Number(row.visitors),
+          })),
+        )
+        .catch(() => []),
+
+      tinybird.browsersData
+        .query(queryParams)
+        .then((res) =>
+          res.data.map((row: BrowsersDataOutput) => ({
+            browser: row.browser || "Unknown",
+            visitors: Number(row.visitors),
+          })),
+        )
+        .catch(() => []),
+
+      tinybird.osData
+        .query(queryParams)
+        .then((res) =>
+          res.data.map((row: OSDataOutput) => ({
+            os: row.os || "Unknown",
+            visitors: Number(row.visitors),
+          })),
+        )
+        .catch(() => []),
+    ]);
 
   return Response.json({
-    data: { link, from, to, clicksOverTime, countriesData, devicesData },
+    data: {
+      link,
+      from,
+      to,
+      clicksOverTime,
+      countriesData,
+      devicesData,
+      browsersData,
+      osData,
+    },
   });
 };

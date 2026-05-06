@@ -273,14 +273,15 @@ export default function DocsPage() {
 
             <EndpointCard
               method="GET"
-              path="/api/v1/links/:id/stats?period=30d"
+              path="/api/v1/links/:id/stats?from=2026-04-01&to=2026-04-30"
               title="Get Link Stats"
-              description="Retrieve analytical data including clicks over time, geographic distribution, and devices."
+              description="Retrieve analytical data including clicks over time, geographic distribution, devices, browsers, and operating systems."
               icon={BarChart2}
               responseBody={`{
   "data": {
     "link": { ... },
-    "period": "30d",
+    "from": "2026-04-01",
+    "to": "2026-04-30",
     "clicksOverTime": [
       { "date": "2026-04-22", "clicks": 15, "uniqueVisitors": 12 },
       { "date": "2026-04-23", "clicks": 42, "uniqueVisitors": 38 }
@@ -292,6 +293,14 @@ export default function DocsPage() {
     "devicesData": [
       { "device": "desktop", "visitors": 95 },
       { "device": "mobile", "visitors": 70 }
+    ],
+    "browsersData": [
+      { "browser": "Chrome", "visitors": 80 },
+      { "browser": "Safari", "visitors": 55 }
+    ],
+    "osData": [
+      { "os": "Windows", "visitors": 90 },
+      { "os": "macOS", "visitors": 60 }
     ]
   }
 }`}
