@@ -81,7 +81,7 @@ export const GET = async (
 
   if (!link) {
     logger.warn({ code }, "Short link not found");
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/link-not-found", request.url));
   }
 
   const targetUrl = link.originalUrl;
