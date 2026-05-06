@@ -16,19 +16,22 @@ import {
   SectionCardsSkeleton,
 } from "@/components/dashboard/charts/chart-skeletons";
 import { Suspense } from "react";
+import { getDashboardMetrics } from "@/data/links";
 import {
-  getClicksOverTime,
-  getCountriesData,
-  getDashboardMetrics,
-  getDevicesData,
-  getBrowsersData,
-  getOSData,
-  getAvailableCountries,
-  getAvailableDevices,
-} from "@/data/links";
+  queryClicksOverTime,
+  queryCountriesData,
+  queryDevicesData,
+  queryBrowsersData,
+  queryOSData,
+  queryAvailableCountries,
+  queryAvailableDevices,
+} from "@/data/analytics";
 import CountrySelect from "@/components/dashboard/country-select";
 import DeviceSelect from "@/components/dashboard/device-select";
 import { getParam } from "@/lib/utils";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Overview",
@@ -39,6 +42,12 @@ export default async function Page({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) redirect("/sign-in");
+
   const params = await searchParams;
 
   const today = new Date();
@@ -52,13 +61,24 @@ export default async function Page({
   const deviceParam = getParam(params.device);
   const device = deviceParam === "all" ? "" : deviceParam;
 
-  const clicksData = getClicksOverTime(undefined, from, to, country, device);
-  const devicesData = getDevicesData(undefined, from, to, country, device);
-  const browsersData = getBrowsersData(undefined, from, to, country, device);
-  const osData = getOSData(undefined, from, to, country, device);
-  const countriesData = getCountriesData(undefined, from, to, country, device);
-  const allCountries = getAvailableCountries(undefined, from, to);
-  const allDevices = getAvailableDevices(undefined, from, to);
+  const userId = session.user.id;
+  const queryParams = { userId, fromDate: from, toDate: to, country, device };
+
+  const clicksData = queryClicksOverTime(queryParams);
+  const devicesData = queryDevicesData(queryParams);
+  const browsersData = queryBrowsersData(queryParams);
+  const osData = queryOSData(queryParams);
+  const countriesData = queryCountriesData(queryParams);
+  const allCountries = queryAvailableCountries({
+    userId,
+    fromDate: from,
+    toDate: to,
+  });
+  const allDevices = queryAvailableDevices({
+    userId,
+    fromDate: from,
+    toDate: to,
+  });
   const metrics = getDashboardMetrics(from, to, country, device);
 
   return (

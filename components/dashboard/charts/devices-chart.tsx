@@ -16,7 +16,6 @@ import { use, useMemo } from "react";
 interface ChartData {
   device: string;
   visitors: number;
-  fill: string;
 }
 
 interface DevicesChartProps {
@@ -26,8 +25,17 @@ interface DevicesChartProps {
 const DevicesChart = ({ data }: DevicesChartProps) => {
   const chartData = use(data);
 
+  const chartDataWithFill = useMemo(
+    () =>
+      chartData.map((item, index) => ({
+        ...item,
+        fill: `var(--chart-${(index % 5) + 1})`,
+      })),
+    [chartData],
+  );
+
   const dynamicConfig = useMemo(() => {
-    return chartData.reduce(
+    return chartDataWithFill.reduce(
       (config, item) => {
         const key = item.device;
         config[key] = {
@@ -40,7 +48,7 @@ const DevicesChart = ({ data }: DevicesChartProps) => {
         visitors: { label: "Visitors" },
       } as ChartConfig,
     );
-  }, [chartData]);
+  }, [chartDataWithFill]);
 
   return (
     <Card className="flex flex-col">
@@ -48,7 +56,7 @@ const DevicesChart = ({ data }: DevicesChartProps) => {
         <CardTitle>Devices</CardTitle>
       </CardHeader>
       <CardContent className="flex-1">
-        {!chartData.length ? (
+        {!chartDataWithFill.length ? (
           <div className="flex h-[250px] flex-col items-center justify-center gap-2">
             <p className="text-muted-foreground text-sm">No data available</p>
           </div>
@@ -63,7 +71,7 @@ const DevicesChart = ({ data }: DevicesChartProps) => {
                 content={<ChartTooltipContent hideLabel />}
               />
               <Pie
-                data={chartData}
+                data={chartDataWithFill}
                 dataKey="visitors"
                 nameKey="device"
                 innerRadius={60}

@@ -6,11 +6,11 @@ interface DateRow {
   [key: string]: unknown;
 }
 
-export const fillMissingDates = (
-  data: DateRow[],
+export const fillMissingDates = <T extends DateRow>(
+  data: T[],
   fromDate: string,
   toDate: string,
-): DateRow[] => {
+): T[] => {
   if (!fromDate || !toDate || data.length === 0) {
     return data;
   }
@@ -26,7 +26,7 @@ export const fillMissingDates = (
     return allDates.map((date) => {
       const dateStr = format(date, "yyyy-MM-dd");
       if (dataMap.has(dateStr)) {
-        return dataMap.get(dateStr) as DateRow;
+        return dataMap.get(dateStr) as T;
       }
 
       const newRow: DateRow = { date: dateStr };
@@ -35,7 +35,7 @@ export const fillMissingDates = (
           newRow[key] = 0;
         }
       }
-      return newRow;
+      return newRow as T;
     });
   } catch (error) {
     logger.error({ error }, "Error filling missing dates");

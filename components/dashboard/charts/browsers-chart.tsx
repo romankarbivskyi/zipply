@@ -20,7 +20,6 @@ import { use } from "react";
 interface ChartData {
   browser: string;
   visitors: number;
-  fill: string;
 }
 
 interface BrowsersChartProps {
@@ -72,8 +71,11 @@ const BrowsersChart = ({ data }: BrowsersChartProps) => {
                 fill="var(--color-visitors)"
                 radius={[4, 4, 0, 0]}
               >
-                {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                {chartData.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={`var(--chart-${(index % 5) + 1})`}
+                  />
                 ))}
               </Bar>
             </BarChart>
