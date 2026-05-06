@@ -68,7 +68,7 @@ describe("GET /[code]", () => {
 
     expect(response.status).toBe(307);
     expect(NextResponse.redirect).toHaveBeenCalledWith(
-      new URL("/", mockRequest.url),
+      new URL("/link-not-found", mockRequest.url),
     );
   });
 
