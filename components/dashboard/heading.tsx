@@ -9,7 +9,7 @@ interface HeadingProps {
 
 const Heading = ({ title }: HeadingProps) => {
   return (
-    <div className="flex items-center gap-2 border-b p-2">
+    <div className="bg-background sticky top-0 z-20 flex items-center gap-2 border-b p-2">
       <SidebarTrigger />
       <Separator
         orientation="vertical"
