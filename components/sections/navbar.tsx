@@ -10,15 +10,13 @@ export function Navbar() {
           href="/"
           className="flex items-center gap-2 text-xl font-bold tracking-tighter sm:gap-3 sm:text-2xl"
         >
-          <div className="bg-foreground text-background rounded-lg p-1 sm:p-1.5">
-            <LogoIcon className="size-5 sm:size-6" />
-          </div>
+          <LogoIcon className="size-5 sm:size-6" />
           Zipply
         </Link>
         <nav className="flex items-center gap-3 sm:gap-6">
           <Link
             href="/sign-in"
-            className="hover:text-foreground/80 text-sm font-semibold transition-colors"
+            className="hover:text-foreground/80 text-sm font-semibold transition-colors hover:underline"
           >
             Log in
           </Link>

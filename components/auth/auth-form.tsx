@@ -98,18 +98,18 @@ const AuthForm = ({ type }: AuthFormProps) => {
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-2xl">
-          {isSignIn ? "👋 Welcome back" : "Create an account"}
+          {isSignIn ? "Welcome back" : "Create an account"}
         </CardTitle>
         <CardDescription>
           {isSignIn
-            ? "Welcome back! Please enter your details."
-            : "Let's get you set up with a new account."}
+            ? "Enter your email and password to sign in to your account."
+            : "Enter your details to create an account."}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Button
-          variant="secondary"
-          className="w-full"
+          variant="outline"
+          className="w-full cursor-pointer"
           onClick={handleGoogleSignIn}
         >
           <GoogleIcon />
