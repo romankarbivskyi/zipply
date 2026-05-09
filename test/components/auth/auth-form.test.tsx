@@ -38,7 +38,7 @@ describe("AuthForm", () => {
 
   it("renders sign in form properly", () => {
     render(<AuthForm type="sign-in" />);
-    expect(screen.getByText("👋 Welcome back")).toBeInTheDocument();
+    expect(screen.getByText("Welcome back")).toBeInTheDocument();
     expect(
       screen.getByPlaceholderText("Enter your email address"),
     ).toBeInTheDocument();
