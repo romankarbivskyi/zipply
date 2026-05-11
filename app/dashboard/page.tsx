@@ -26,6 +26,7 @@ import {
   queryAvailableCountries,
   queryAvailableDevices,
 } from "@/data/analytics";
+import { Skeleton } from "@/components/ui/skeleton";
 import CountrySelect from "@/components/dashboard/country-select";
 import DeviceSelect from "@/components/dashboard/device-select";
 import { getParam } from "@/lib/utils";
@@ -90,8 +91,12 @@ export default async function Page({
         </Suspense>
         <div className="flex flex-wrap gap-4">
           <CalendarRange />
-          <CountrySelect countries={allCountries} />
-          <DeviceSelect devices={allDevices} />
+          <Suspense fallback={<Skeleton className="h-10 w-[180px]" />}>
+            <CountrySelect countries={allCountries} />
+          </Suspense>
+          <Suspense fallback={<Skeleton className="h-10 w-[180px]" />}>
+            <DeviceSelect devices={allDevices} />
+          </Suspense>
         </div>
         <Suspense fallback={<VisitorsChartSkeleton />}>
           <VisitorsChart data={clicksData} />

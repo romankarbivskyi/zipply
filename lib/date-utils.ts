@@ -23,19 +23,22 @@ export const fillMissingDates = <T extends DateRow>(
     const dataMap = new Map(data.map((d) => [d.date, d]));
     const template = data[0];
 
+    const defaultValues: Record<string, number> = {};
+    for (const key of Object.keys(template)) {
+      if (key !== "date" && typeof template[key] === "number") {
+        defaultValues[key] = 0;
+      }
+    }
+
     return allDates.map((date) => {
       const dateStr = format(date, "yyyy-MM-dd");
-      if (dataMap.has(dateStr)) {
-        return dataMap.get(dateStr) as T;
+
+      const existingData = dataMap.get(dateStr);
+      if (existingData) {
+        return existingData;
       }
 
-      const newRow: DateRow = { date: dateStr };
-      for (const key of Object.keys(template)) {
-        if (key !== "date" && typeof template[key] === "number") {
-          newRow[key] = 0;
-        }
-      }
-      return newRow as T;
+      return { date: dateStr, ...defaultValues } as T;
     });
   } catch (error) {
     logger.error({ error }, "Error filling missing dates");
