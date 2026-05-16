@@ -84,7 +84,9 @@ const LinkCard = ({ link }: LinkCardProps) => {
                 target="_blank"
               >
                 <IconExternalLink className="size-3.5 shrink-0" />
-                {link.originalUrl}
+                {link.originalUrl.length > 100
+                  ? link.originalUrl.substring(0, 100) + "..."
+                  : link.originalUrl}
               </Link>
             </div>
           </div>
