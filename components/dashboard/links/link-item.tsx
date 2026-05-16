@@ -91,12 +91,14 @@ const LinkItem = ({ link }: LinkItemProps) => {
             </h3>
             <Link
               href={link.originalUrl}
-              className="text-muted-foreground hover:text-foreground inline-flex max-w-full items-center gap-1 text-[11px] transition-colors hover:underline"
+              className="text-muted-foreground hover:text-foreground inline-flex max-w-full items-center gap-1 text-[11px] wrap-break-word transition-colors hover:underline"
               target="_blank"
               onClick={(e) => e.stopPropagation()}
             >
               <IconExternalLink className="size-3 shrink-0" />
-              {link.originalUrl}
+              {link.originalUrl.length > 100
+                ? link.originalUrl.substring(0, 100) + "..."
+                : link.originalUrl}
             </Link>
           </div>
         </div>
