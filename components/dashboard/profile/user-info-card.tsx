@@ -10,6 +10,7 @@ import { IconMail, IconCalendar } from "@tabler/icons-react";
 import Image from "next/image";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { UpdateNameDialog } from "./update-name-dialog";
 
 const UserInfoCard = async () => {
   const session = await auth.api.getSession({
@@ -38,6 +39,7 @@ const UserInfoCard = async () => {
           <div className="min-w-0 flex-1 space-y-1.5">
             <div className="flex items-center gap-2">
               <CardTitle className="text-xl font-bold">{user.name}</CardTitle>
+              <UpdateNameDialog currentName={user.name || ""} />
               {user.emailVerified && (
                 <Badge variant="secondary" className="text-xs">
                   Verified
