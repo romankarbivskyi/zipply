@@ -16,9 +16,19 @@ import {
   SquareMinus,
 } from "lucide-react";
 import { ButtonGroup } from "@/components/ui/button-group";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface SelectionToolbarProps {
   currentLinkIds: string[];
@@ -26,8 +36,10 @@ interface SelectionToolbarProps {
 
 const SelectionToolbar = ({ currentLinkIds }: SelectionToolbarProps) => {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
+  const [isDeleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const { selectedIds, selectAll, clearSelection } = useSelectionStore();
+
+  const router = useRouter();
 
   const selectedCount = currentLinkIds.reduce(
     (count, id) => count + (selectedIds.has(id) ? 1 : 0),
@@ -57,43 +69,64 @@ const SelectionToolbar = ({ currentLinkIds }: SelectionToolbarProps) => {
   };
 
   return (
-    <ButtonGroup>
-      <Button
-        variant="outline"
-        onClick={() =>
-          anySelected ? clearSelection() : selectAll(currentLinkIds)
-        }
-      >
-        {allSelected ? (
-          <SquareCheck />
-        ) : anySelected ? (
-          <SquareMinus />
-        ) : (
-          <Square />
-        )}
-      </Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon">
-            <MoreVerticalIcon />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => selectAll(currentLinkIds)}>
-            All
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={clearSelection}>None</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={handleDeleteSelected}
-            disabled={!anySelected || isPending}
-          >
-            Delete Selected
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </ButtonGroup>
+    <>
+      <ButtonGroup>
+        <Button
+          variant="outline"
+          onClick={() =>
+            anySelected ? clearSelection() : selectAll(currentLinkIds)
+          }
+        >
+          {allSelected ? (
+            <SquareCheck />
+          ) : anySelected ? (
+            <SquareMinus />
+          ) : (
+            <Square />
+          )}
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon">
+              <MoreVerticalIcon />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => selectAll(currentLinkIds)}>
+              All
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={clearSelection}>None</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => setDeleteAlertOpen(true)}
+              disabled={!anySelected || isPending}
+            >
+              Delete Selected
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </ButtonGroup>
+      <AlertDialog open={isDeleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              selected links.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <Button variant="destructive" onClick={handleDeleteSelected}>
+                Delete
+              </Button>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 

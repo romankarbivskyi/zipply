@@ -28,6 +28,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import QRCode from "react-qr-code";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface LinkCardProps {
   link: LinkType;
@@ -52,7 +63,7 @@ const LinkCard = ({ link }: LinkCardProps) => {
         return;
       }
       toast.success("Link deleted successfully");
-      router.refresh();
+      router.replace("/dashboard/links");
     });
   };
 
@@ -162,15 +173,35 @@ const LinkCard = ({ link }: LinkCardProps) => {
             </DialogContent>
           </Dialog>
 
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleDelete}
-            disabled={isPending}
-          >
-            <Trash className="size-3.5" />
-            Delete
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm" disabled={isPending}>
+                <Trash className="size-3.5" />
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  link.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction asChild>
+                  <Button
+                    variant="destructive"
+                    onClick={handleDelete}
+                    disabled={isPending}
+                  >
+                    Delete
+                  </Button>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </Card>
