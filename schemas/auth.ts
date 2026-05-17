@@ -59,3 +59,7 @@ export const updatePasswordSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export const updateNameSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+});
